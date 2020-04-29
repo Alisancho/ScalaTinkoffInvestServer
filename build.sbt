@@ -15,7 +15,7 @@ lazy val logBackVersion = "1.2.3"
 lazy val catsVersion       = "2.0.0"
 lazy val catsEffectVersion = "2.0.0"
 lazy val fs2Version        = "2.0.1"
-
+lazy val quillVersion      = "3.4.10"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
@@ -39,3 +39,17 @@ libraryDependencies ++= Seq(
   "co.fs2" %% "fs2-core" % fs2Version,
   "co.fs2" %% "fs2-io" % fs2Version
 )
+
+libraryDependencies ++= Seq(
+  "io.getquill" %% "quill-sql" % quillVersion,
+  "io.getquill" %% "quill-core" % quillVersion,
+  "io.getquill" %% "quill-jdbc-monix" % quillVersion,
+  "mysql" % "mysql-connector-java" % "8.0.18"
+)
+libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
+
+libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.3" % "provided"
+
+libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.3"
+
+libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.3"
