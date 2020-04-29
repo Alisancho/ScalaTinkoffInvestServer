@@ -1,9 +1,6 @@
 package ru.invest.controllers
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, _}
 import akka.http.scaladsl.server.{Directives, Route}
-import monix.eval.Task
-import ru.invest.AppStart.logger
-import ru.invest.core.config.ConfigObject.TOKEN
 import ru.invest.service.{DataBaseServiceImpl, TinkoffRESTServiceImpl}
 
 import scala.language.postfixOps

@@ -18,14 +18,13 @@ import monix.execution.schedulers.SchedulerService
 import ru.invest.controllers.TaskController
 
 import scala.concurrent.ExecutionContextExecutor
-import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
 
 object AppStart extends TaskApp with AppStartHelper {
 
   override def run(args: List[String]): Task[ExitCode] =
     for {
-      ts  <- Task { new TinkoffRESTServiceImpl(TOKEN, TINKOFF_BROKER_ACCOUNT_ID, logger) }
+      ts  <- Task { new TinkoffRESTServiceImpl(TOKEN, TINKOFF_BROKER_ACCOUNT_ID, loggerForStream) }
       dbs <- Task { new DataBaseServiceImpl }
       tc  <- Task { new TaskController(ts, dbs) }
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs)(schedulerDB) }
@@ -36,20 +35,20 @@ object AppStart extends TaskApp with AppStartHelper {
 }
 
 trait AppStartHelper {
-  implicit val system: ActorSystem            = ActorSystem()
-  implicit val ec: ExecutionContextExecutor   = system.dispatcher
-  implicit val ctx: MyContext                 = new MyContext()
-  lazy val schedulerDB: SchedulerService      = Scheduler.fixedPool(name = "my-fixed", poolSize = 4)
-  lazy val schedulerTinkoff: SchedulerService = Scheduler.fixedPool(name = "my-fixed", poolSize = 4)
-  val logger: Logger                          = Logger.getLogger("Pooo")
+  implicit val system: ActorSystem          = ActorSystem()
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
+  implicit val ctx: MyContext               = new MyContext()
+  val schedulerDB: SchedulerService         = Scheduler.fixedPool(name = "my-fixed", poolSize = 4)
+  val schedulerTinkoff: SchedulerService    = Scheduler.fixedPool(name = "my-fixed", poolSize = 4)
+  val loggerForStream: Logger               = Logger.getLogger("Pooo")
 
 }
 
 class MyContext extends MysqlMonixJdbcContext(SnakeCase, "ctx") {
-  lazy implicit val instantEncoder = MappedEncoding[Instant, Date] { i =>
+  lazy implicit val instantEncoder: MappedEncoding[Instant, Date] = MappedEncoding[Instant, Date] { i =>
     new Date(i.toEpochMilli)
   }
-  lazy implicit val instantDecoder = MappedEncoding[Date, Instant] { d =>
+  lazy implicit val instantDecoder: MappedEncoding[Date, Instant] = MappedEncoding[Date, Instant] { d =>
     Instant.ofEpochMilli(d.getTime)
   }
 }

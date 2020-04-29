@@ -1,5 +1,4 @@
 package ru.invest.service
-
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
@@ -9,6 +8,5 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
     for {
       q <- tinkoffRESTServiceImpl.getPortfolio
       _ = q.positions.stream().forEach(m => dataBaseServiceImpl.insertTaskMonitoring(m).runAsyncAndForget(schedulerDB))
-    } yield (true)
-
+    } yield true
 }
