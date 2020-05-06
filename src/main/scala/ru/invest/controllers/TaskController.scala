@@ -1,11 +1,12 @@
 package ru.invest.controllers
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, _}
 import akka.http.scaladsl.server.{Directives, Route}
-import ru.invest.service.{DataBaseServiceImpl, TinkoffRESTServiceImpl}
+import monix.execution.schedulers.SchedulerService
+import ru.invest.service.{BusinessProcessServiceImpl, DataBaseServiceImpl, TinkoffRESTServiceImpl}
 
 import scala.language.postfixOps
 
-class TaskController(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl) {
+class TaskController(businessProcessServiceImpl: BusinessProcessServiceImpl)(schedulerTinkoff: SchedulerService) {
   def routApiV1: Route =
     pathPrefix("api" / "v1") {
       path("version") {
@@ -13,9 +14,10 @@ class TaskController(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl, dataBaseSer
           complete("version=2.4")
         }
       } ~ path("startMonitoring") {
-        post {
+        get {
           entity(as[String]) { p =>
-            complete("OK")
+          println("________________________")
+            complete(businessProcessServiceImpl.statrMonitoring.runToFuture(schedulerTinkoff))
           }
         }
       }

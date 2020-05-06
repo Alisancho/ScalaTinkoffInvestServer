@@ -1,7 +1,7 @@
 package ru.invest.service
 
 import monix.eval.Task
-import ru.invest.MyContext
+import ru.invest.core.config.MyContext
 import ru.invest.service.helpers.database.{FigiMonitoring, TinkoffTools}
 
 class DataBaseServiceImpl(implicit val ctx: MyContext) {

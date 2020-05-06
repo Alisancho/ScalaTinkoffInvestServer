@@ -2,8 +2,14 @@ package ru.invest.service
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
-    schedulerDB: SchedulerService) {
-  
+    schedulerDB: SchedulerService,schedulerTinkoff: SchedulerService) {
+
+  def statrMonitoring: Task[String] =
+    for {
+      k <- dataBaseServiceImpl.selectFIGIMonitoring
+      _ = k.foreach(w => tinkoffRESTServiceImpl.startNewMonitoring(w.figi).runAsync(_ => ())(schedulerTinkoff))
+    } yield "OK"
+
   def ubdateTinkoffToolsTable: Task[Boolean] =
     for {
       mc <- tinkoffRESTServiceImpl.getMarketCurrencies
