@@ -29,8 +29,11 @@ object AppStart extends TaskApp with AppStartHelper {
       tc  <- Task { new TaskController(ts, dbs) }
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs)(schedulerDB) }
       _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
-      k   <- bu.ubdateTaskMonitorind
-//      d = k.instruments.stream().forEach(p => cont.setBlackListFriend(p).runAsyncAndForget(schedulerTask))
+      k   <- bu.ubdateTinkoffToolsTable
+//      q   <- ts.startNewMonitoring("BBG0013HGFT4")
+//      q   <- ts.startNewMonitoring("BBG000BKNX95")
+//      q   <- ts.startNewMonitoring("Palo Alto Networks")
+//      d = tc.instruments.stream().forEach(p => cont.setBlackListFriend(p).runAsyncAndForget(schedulerTask))
     } yield ExitCode.Success
 }
 
