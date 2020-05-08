@@ -9,7 +9,6 @@ import ru.invest.service.{BusinessProcessServiceImpl, DataBaseServiceImpl, Tinko
 
 import scala.language.postfixOps
 import akka.actor.ActorSystem
-
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
@@ -29,7 +28,7 @@ object AppStart extends TaskApp with AppStartHelper {
       tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
       _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
       _   <- bu.ubdateTinkoffToolsTable
-      _   <- dbs.selectFIGIMonitoring
+      _   <- bu.startMonitoringMyProfil
     } yield ExitCode.Success
 }
 

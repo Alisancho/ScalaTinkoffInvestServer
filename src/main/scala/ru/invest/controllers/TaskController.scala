@@ -1,4 +1,5 @@
 package ru.invest.controllers
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, _}
 import akka.http.scaladsl.server.{Directives, Route}
 import monix.execution.schedulers.SchedulerService
@@ -15,8 +16,7 @@ class TaskController(businessProcessServiceImpl: BusinessProcessServiceImpl)(sch
         }
       } ~ path("startMonitoring") {
         get {
-          entity(as[String]) { p =>
-          println("________________________")
+          entity(as[HttpRequest]) { p =>
             complete(businessProcessServiceImpl.statrMonitoring.runToFuture(schedulerTinkoff))
           }
         }

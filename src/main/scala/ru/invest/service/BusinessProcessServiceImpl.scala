@@ -1,8 +1,10 @@
 package ru.invest.service
+import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
-    schedulerDB: SchedulerService,schedulerTinkoff: SchedulerService) {
+    schedulerDB: SchedulerService,
+    schedulerTinkoff: SchedulerService) extends LazyLogging{
 
   def statrMonitoring: Task[String] =
     for {
@@ -21,4 +23,10 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
       _  = me.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
       _  = ms.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
     } yield true
+
+  def startMonitoringMyProfil: Task[String] =
+    for {
+      q <- tinkoffRESTServiceImpl.getPortfolio
+      _ = q.positions.stream().forEach(p => tinkoffRESTServiceImpl.startNewMonitoring(p.figi).runAsync(_ => ())(schedulerTinkoff))
+    } yield ""
 }

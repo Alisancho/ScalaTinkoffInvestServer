@@ -1,12 +1,12 @@
-CREATE TABLE `investdb`.`figi_monitoring`
+CREATE TABLE `investdb`.`figi_monitoring_tbl`
 (
-    `figi`        VARCHAR(45)    NOT NULL,
-    `name`        VARCHAR(128),
+    `figi` VARCHAR(45) NOT NULL,
+    `name` VARCHAR(128),
     PRIMARY KEY (`figi`)
 );
 
 
-CREATE TABLE `investdb`.`tinkoff_tools`
+CREATE TABLE `investdb`.`tinkoff_tools_tbl`
 (
     `figi`             VARCHAR(45)  NOT NULL,
     `name`             VARCHAR(128) NOT NULL,

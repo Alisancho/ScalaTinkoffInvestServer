@@ -2,17 +2,17 @@ package ru.invest.service
 
 import monix.eval.Task
 import ru.invest.core.config.MyContext
-import ru.invest.service.helpers.database.{FigiMonitoring, TinkoffTools}
+import ru.invest.service.helpers.database.{FigiMonitoringTbl, TinkoffToolsTbl}
 
 class DataBaseServiceImpl(implicit val ctx: MyContext) {
   import ctx._
 
-  def selectFIGIMonitoring: Task[List[FigiMonitoring]] = ctx.run(query[FigiMonitoring])
+  def selectFIGIMonitoring: Task[List[FigiMonitoringTbl]] = ctx.run(query[FigiMonitoringTbl])
 
-  def insertFIGIMonitoring(taskMonitoring: FigiMonitoring): Task[Long] =
+  def insertFIGIMonitoring(taskMonitoring: FigiMonitoringTbl): Task[Long] =
     ctx
       .run(
-        query[FigiMonitoring]
+        query[FigiMonitoringTbl]
           .insert(
             _.figi -> lift(taskMonitoring.figi),
             _.name -> lift(taskMonitoring.name),
@@ -23,10 +23,10 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) {
           )
       )
 
-  def insertTinkoffTools(taskMonitoring: TinkoffTools): Task[Long] =
+  def insertTinkoffTools(taskMonitoring: TinkoffToolsTbl): Task[Long] =
     ctx
       .run(
-        query[TinkoffTools]
+        query[TinkoffToolsTbl]
           .insert(
             _.figi             -> lift(taskMonitoring.figi),
             _.name             -> lift(taskMonitoring.name),
