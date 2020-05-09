@@ -1,10 +1,11 @@
 package ru.invest.service
 
+import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import ru.invest.core.config.MyContext
 import ru.invest.service.helpers.database.{FigiMonitoringTbl, TinkoffToolsTbl}
 
-class DataBaseServiceImpl(implicit val ctx: MyContext) {
+class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging{
   import ctx._
 
   def selectFIGIMonitoring: Task[List[FigiMonitoringTbl]] = ctx.run(query[FigiMonitoringTbl])

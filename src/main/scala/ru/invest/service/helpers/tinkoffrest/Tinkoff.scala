@@ -10,9 +10,7 @@ import scala.concurrent.Future
 import scala.concurrent.java8.FuturesConvertersImpl.{CF, P}
 
 trait Tinkoff {
-  val factory: OkHttpOpenApiFactory
   val api: OpenApi
-  val listener: MainSubscriber
   def toScala[T](cs: CompletionStage[T]): Future[T] = {
     cs match {
       case cf: CF[T] => cf.wrapped
