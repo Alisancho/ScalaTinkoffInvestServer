@@ -6,7 +6,13 @@ import java.util.logging.Logger
 import akka.http.scaladsl.Http
 import cats.effect.ExitCode
 import ru.invest.core.config.ConfigObject.{SERVER_HOST, SERVER_PORT, TINKOFF_BROKER_ACCOUNT_ID, TOKEN}
-import ru.invest.service.{BusinessProcessServiceImpl, DataBaseServiceImpl, MathServiceImpl, MonitoringServiceImpl, TinkoffRESTServiceImpl}
+import ru.invest.service.{
+  BusinessProcessServiceImpl,
+  DataBaseServiceImpl,
+  MathServiceImpl,
+  MonitoringServiceImpl,
+  TinkoffRESTServiceImpl
+}
 
 import scala.language.postfixOps
 import akka.actor.ActorSystem
@@ -15,7 +21,6 @@ import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
 import ru.invest.controllers.TaskController
 import ru.invest.core.config.MyContext
-import ru.invest.service.helpers.MLock
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
 
@@ -34,9 +39,6 @@ object AppStart extends TaskApp with AppStartHelper {
       tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
       _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
       _   <- bu.ubdateTinkoffToolsTable
-//      _   <- bu.startMonitoringMyProfil
-    lll <- ts.getPortfolio
-    ccc = lll.positions.stream.forEach(o => dbs.insertFIGIMonitoring(o).runAsyncAndForget(schedulerDB))
     } yield ExitCode.Success
 
 }

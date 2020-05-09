@@ -18,7 +18,7 @@ trait TinkoffOrders extends Tinkoff {
   }
 
   /**
-    * Размещение лимитной заявки.
+    * Размещение рыночной заявки.
     *
     * @param figi            Идентификатор инструмента.
     * @param marketOrder     Параметры отправляемой заявки.
