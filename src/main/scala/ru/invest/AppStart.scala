@@ -30,6 +30,8 @@ object AppStart extends TaskApp with AppStartHelper {
       _   <- bu.ubdateTinkoffToolsTable
       _   <- bu.startMonitoringMyProfil
     } yield ExitCode.Success
+
+
 }
 
 trait AppStartHelper {

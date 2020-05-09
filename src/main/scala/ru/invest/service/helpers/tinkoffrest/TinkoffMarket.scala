@@ -7,7 +7,6 @@ trait TinkoffMarket extends Tinkoff {
 
   /**
     * Получение списка акций
-    * @return
     */
   def getMarketStocks: Task[InstrumentsList] = Task.fromFuture {
     toScala(api.getMarketContext.getMarketStocks)
@@ -15,7 +14,6 @@ trait TinkoffMarket extends Tinkoff {
 
   /**
     * Получение списка ETF
-    * @return
     */
   def getMarketEtfs: Task[InstrumentsList] = Task.fromFuture {
     toScala(api.getMarketContext.getMarketEtfs)
@@ -23,7 +21,6 @@ trait TinkoffMarket extends Tinkoff {
 
   /**
     * Получение списка облигаций
-    * @return
     */
   def getMarketBonds: Task[InstrumentsList] = Task.fromFuture {
     toScala(api.getMarketContext.getMarketBonds)
@@ -31,7 +28,6 @@ trait TinkoffMarket extends Tinkoff {
 
   /**
     * Получение списка валютных пар
-    * @return
     */
   def getMarketCurrencies: Task[InstrumentsList] = Task.fromFuture {
     toScala(api.getMarketContext.getMarketCurrencies)
