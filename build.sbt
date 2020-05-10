@@ -51,5 +51,8 @@ libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.3" % "p
 libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.3"
 
 libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.3"
-// https://mvnrepository.com/artifact/io.projectreactor/reactor-core
+
 libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
+
+// https://mvnrepository.com/artifact/org.telegram/telegrambots
+libraryDependencies += "org.telegram" % "telegrambots" % "4.7"

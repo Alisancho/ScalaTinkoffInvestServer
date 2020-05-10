@@ -5,24 +5,18 @@ import java.util.logging.Logger
 
 import akka.http.scaladsl.Http
 import cats.effect.ExitCode
-import ru.invest.core.config.ConfigObject.{
-  SERVER_HOST,
-  SERVER_PORT,
-  TINKOFF_BROKER_ACCOUNT_ID,
-  TOKEN,
-  SCHEDULER_POOL_DB,
-  SCHEDULER_POOL_TINKOFF,
-  POOL_OPENAPI
-}
+import ru.invest.core.config.ConfigObject._
 import ru.invest.service.{
   BusinessProcessServiceImpl,
   DataBaseServiceImpl,
   MonitoringServiceImpl,
+  TelegramServiceImpl,
   TinkoffRESTServiceImpl
 }
 
 import scala.language.postfixOps
 import akka.actor.ActorSystem
+import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
@@ -39,6 +33,7 @@ object AppStart extends TaskApp with AppStartHelper {
   override def run(args: List[String]): Task[ExitCode] =
     for {
       api <- apiTask
+      _   <- Task { new TelegramServiceImpl(TELEGRAM_HOST, TELEGRAM_PORT, TELEGRAM_TOKEN, TELEGRAM_NAMEBOT) }
       ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
       ms  <- Task { new MonitoringServiceImpl(api) }
       dbs <- Task { new DataBaseServiceImpl }
@@ -49,7 +44,7 @@ object AppStart extends TaskApp with AppStartHelper {
     } yield ExitCode.Success
 }
 
-trait AppStartHelper {
+trait AppStartHelper extends LazyLogging {
   implicit val system: ActorSystem          = ActorSystem()
   implicit val ec: ExecutionContextExecutor = system.dispatcher
   implicit val ctx: MyContext               = new MyContext()

@@ -12,7 +12,7 @@ class BusinessProcessServiceImpl(
   def statrMonitoring: Task[String] =
     for {
       k <- dataBaseServiceImpl.selectFIGIMonitoring
-      _ = k.foreach(w => monitoringServiceImpl.startNewMonitoring(w.figi).runAsync(_ => ())(schedulerTinkoff))
+      _ = k.foreach(w => monitoringServiceImpl.startMonitoring(w.figi).runAsync(_ => ())(schedulerTinkoff))
     } yield "OK"
 
   def ubdateTinkoffToolsTable: Task[Boolean] =
@@ -32,6 +32,6 @@ class BusinessProcessServiceImpl(
       q <- tinkoffRESTServiceImpl.getPortfolio
       _ = q.positions
         .stream()
-        .forEach(p => monitoringServiceImpl.startNewMonitoring(p.figi).runAsync(_ => ())(schedulerTinkoff))
+        .forEach(p => monitoringServiceImpl.startMonitoring(p.figi).runAsync(_ => ())(schedulerTinkoff))
     } yield ""
 }

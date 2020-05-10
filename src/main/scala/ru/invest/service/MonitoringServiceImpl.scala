@@ -10,8 +10,6 @@ import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.models.market.CandleInterval
 import ru.tinkoff.invest.openapi.models.streaming.{StreamingEvent, StreamingRequest}
 
-import scala.concurrent.Future
-
 class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends LazyLogging {
   val sharedKillSwitch: SharedKillSwitch = KillSwitches.shared("my-kill-switch")
 
@@ -28,11 +26,15 @@ class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends 
 //    .via(sharedKillSwitch.flow)
 //    .runForeach(i => println(i.toString))
 
-  def startNewMonitoring(figi: String): Task[Unit] = Task {
+  def startMonitoring(figi: String): Task[Unit] = Task {
     api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
-  val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+  def stopMonitoring(figi: String): Task[Unit] = Task {
+    api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
+  }
+
+  val g: RunnableGraph[NotUsed] = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
     val in = Source
       .fromPublisher(api.getStreamingContext.getEventPublisher)
