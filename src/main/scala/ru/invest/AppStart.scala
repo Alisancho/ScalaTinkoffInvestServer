@@ -47,7 +47,6 @@ object AppStart extends TaskApp with AppStartHelper {
       _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
       _   <- bu.ubdateTinkoffToolsTable
     } yield ExitCode.Success
-
 }
 
 trait AppStartHelper {
@@ -60,5 +59,4 @@ trait AppStartHelper {
     log <- Task { Logger.getLogger("Pooo") }
     api <- Task { new OkHttpOpenApiFactory(TOKEN, log).createOpenApiClient(Executors.newFixedThreadPool(POOL_OPENAPI)) }
   } yield api
-
 }
