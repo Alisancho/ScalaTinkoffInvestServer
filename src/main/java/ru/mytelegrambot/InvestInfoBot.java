@@ -5,6 +5,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+//@Slf4j
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
     private final String name;
@@ -44,7 +45,12 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public void sendMess(String mess) {
+    public void sendMessage(String mess) {
+        try {
+            execute(new SendMessage(chat_id, mess));
+        } catch (Throwable ignored) {
+            //log.error(ignored.getMessage());
+        }
     }
 
 

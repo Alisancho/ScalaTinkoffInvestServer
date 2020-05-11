@@ -34,7 +34,7 @@ class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends 
     api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
-  val g: RunnableGraph[NotUsed] = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+  val g = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
     import GraphDSL.Implicits._
     val in = Source
       .fromPublisher(api.getStreamingContext.getEventPublisher)
@@ -56,6 +56,6 @@ class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends 
     in ~> f1 ~> bcast ~> f2 ~> merge ~> f3 ~> out
     bcast ~> f4 ~> merge
     ClosedShape
-  })
+  }).run()
 
 }
