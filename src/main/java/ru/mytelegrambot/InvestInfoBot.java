@@ -8,19 +8,24 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
     private final String name;
+    private final Long chat_id;
 
-
-    public InvestInfoBot(String token, String name, DefaultBotOptions defaultBotOptions) {
+    public InvestInfoBot(String token, String name, DefaultBotOptions defaultBotOptions, Long chat_id) {
         super(defaultBotOptions);
         this.token = token;
         this.name = name;
+        this.chat_id = chat_id;
+    }
 
+    public InvestInfoBot(String token, String name, Long chat_id) {
+        this.token = token;
+        this.name = name;
+        this.chat_id = chat_id;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
         if (update.getMessage() != null && update.getMessage().hasText()) {
-            Long chat_id = update.getMessage().getChatId();
             try {
                 execute(new SendMessage(chat_id, update.getMessage().getChatId().toString()));
             } catch (Throwable e) {

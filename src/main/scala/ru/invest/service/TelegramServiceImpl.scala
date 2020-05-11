@@ -6,16 +6,24 @@ import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.meta.{ApiContext, TelegramBotsApi}
 import ru.mytelegrambot.InvestInfoBot
 
-class TelegramServiceImpl(host: String, port: Int, token: String, name: String) extends LazyLogging{
+class TelegramServiceImpl(token: String, name: String, chat_id: Long, host: Option[String], port: Option[Int])
+    extends LazyLogging {
 
   ApiContextInitializer.init()
-  private val bootOption: DefaultBotOptions = ApiContext.getInstance(classOf[DefaultBotOptions])
-  bootOption.setProxyType(DefaultBotOptions.ProxyType.SOCKS5)
-  bootOption.setProxyHost(host)
-  bootOption.setProxyPort(port)
+  val telegramBotsApi = new TelegramBotsApi()
 
-  private val investBot: InvestInfoBot = new InvestInfoBot(token, name, bootOption)
-  private val telegramBotsApi  = new TelegramBotsApi()
+  val investBot: InvestInfoBot = (for {
+    z <- host
+    x <- port
+  } yield new InvestInfoBot(token, name, getProxy(z, x), chat_id)).getOrElse(new InvestInfoBot(token, name, chat_id))
+
   telegramBotsApi.registerBot(investBot)
 
+  private def getProxy(localHost: String, localPort: Int): DefaultBotOptions = {
+    val bootOption: DefaultBotOptions = ApiContext.getInstance(classOf[DefaultBotOptions])
+    bootOption.setProxyType(DefaultBotOptions.ProxyType.SOCKS5)
+    bootOption.setProxyHost(localHost)
+    bootOption.setProxyPort(localPort)
+    bootOption
+  }
 }

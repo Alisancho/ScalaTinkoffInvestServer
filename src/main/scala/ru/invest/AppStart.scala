@@ -33,7 +33,7 @@ object AppStart extends TaskApp with AppStartHelper {
   override def run(args: List[String]): Task[ExitCode] =
     for {
       api <- apiTask
-      _   <- Task { new TelegramServiceImpl(TELEGRAM_HOST, TELEGRAM_PORT, TELEGRAM_TOKEN, TELEGRAM_NAMEBOT) }
+      _   <- startTelegramService
       ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
       ms  <- Task { new MonitoringServiceImpl(api) }
       dbs <- Task { new DataBaseServiceImpl }
@@ -50,8 +50,23 @@ trait AppStartHelper extends LazyLogging {
   implicit val ctx: MyContext               = new MyContext()
   val schedulerDB: SchedulerService         = Scheduler.fixedPool(name = "my-fixed-db", poolSize = SCHEDULER_POOL_DB)
   val schedulerTinkoff: SchedulerService    = Scheduler.fixedPool(name = "my-fixed-tinkoff", poolSize = SCHEDULER_POOL_TINKOFF)
+
   val apiTask: Task[OpenApi] = for {
     log <- Task { Logger.getLogger("Pooo") }
     api <- Task { new OkHttpOpenApiFactory(TOKEN, log).createOpenApiClient(Executors.newFixedThreadPool(POOL_OPENAPI)) }
   } yield api
+
+  def proxyLogic[T](q: Boolean, w: T): Option[T] =
+    if (q) {
+      Option.apply(w)
+    } else {
+      Option.empty
+    }
+  val startTelegramService: Task[TelegramServiceImpl] = Task {
+    new TelegramServiceImpl(TELEGRAM_TOKEN,
+                            TELEGRAM_NAMEBOT,
+                            TELEGRAM_CHAT_ID,
+                            proxyLogic(TELEGRAM_PROXY, TELEGRAM_HOST),
+                            proxyLogic(TELEGRAM_PROXY, TELEGRAM_PORT))
+  }
 }
