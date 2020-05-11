@@ -45,7 +45,6 @@ class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends 
 
     val f1, f2, f3, f4 = Flow[StreamingEvent].map({
       case candle: StreamingEvent.Candle => {
-        println("+++++++" + candle.toString)
         candle
       }
       case q: StreamingEvent.Orderbook      => q
