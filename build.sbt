@@ -1,3 +1,4 @@
+import sbtassembly.MergeStrategy
 name := "ScalaTinkoffInvestServer"
 
 version := "0.1"
@@ -56,3 +57,33 @@ libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
 
 // https://mvnrepository.com/artifact/org.telegram/telegrambots
 libraryDependencies += "org.telegram" % "telegrambots" % "4.7"
+
+lazy val commonSettings = Seq(
+  test in assembly := {}
+)
+
+lazy val app = (project in file("app")).
+  settings(commonSettings: _*).
+  settings(
+    mainClass in assembly := Some("ru.invest.AppStart"),
+  )
+assemblyMergeStrategy in assembly := {
+  case x if Assembly.isConfigFile(x) =>
+    MergeStrategy.concat
+  case PathList(ps @ _*) if Assembly.isReadme(ps.last) || Assembly.isLicenseFile(ps.last) =>
+    MergeStrategy.rename
+  case PathList("META-INF", xs @ _*) =>
+    (xs map {_.toLowerCase}) match {
+      case ("manifest.mf" :: Nil) | ("index.list" :: Nil) | ("dependencies" :: Nil) =>
+        MergeStrategy.discard
+      case ps @ (x :: xs) if ps.last.endsWith(".sf") || ps.last.endsWith(".dsa") =>
+        MergeStrategy.discard
+      case "plexus" :: xs =>
+        MergeStrategy.discard
+      case "services" :: xs =>
+        MergeStrategy.filterDistinctLines
+      case ("spring.schemas" :: Nil) | ("spring.handlers" :: Nil) =>
+        MergeStrategy.filterDistinctLines
+      case _ => MergeStrategy.first
+    }
+  case _ => MergeStrategy.first}
