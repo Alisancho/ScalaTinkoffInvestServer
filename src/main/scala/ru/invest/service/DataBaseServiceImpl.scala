@@ -3,12 +3,15 @@ package ru.invest.service
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import ru.invest.core.config.MyContext
-import ru.invest.service.helpers.database.{FigiMonitoringTbl, TinkoffToolsTbl}
+import ru.invest.service.helpers.database.{FigiMonitoringTbl, TaskMonitoringTbl, TinkoffToolsTbl}
 
 class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging{
   import ctx._
 
   def selectFIGIMonitoring: Task[List[FigiMonitoringTbl]] = ctx.run(query[FigiMonitoringTbl])
+  def selectTaskMonitoring: Task[List[TaskMonitoringTbl]] = ctx.run(query[TaskMonitoringTbl].filter(
+    l => l.task_status == "ON"))
+
 
   def insertFIGIMonitoring(taskMonitoring: FigiMonitoringTbl): Task[Long] =
     ctx

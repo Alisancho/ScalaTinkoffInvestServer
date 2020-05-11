@@ -9,6 +9,15 @@ class BusinessProcessServiceImpl(
     monitoringServiceImpl: MonitoringServiceImpl)(schedulerDB: SchedulerService, schedulerTinkoff: SchedulerService)
     extends LazyLogging {
 
+  def startAllTaskMonitoring(): Task[String] =
+    (for {
+      z <- dataBaseServiceImpl.selectTaskMonitoring
+      b = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi).runAsync(_ => ())(schedulerTinkoff))
+    } yield "").onErrorHandle(p => {
+      logger.error(p.getMessage)
+      "d"
+    })
+
   def statrMonitoring: Task[String] =
     for {
       k <- dataBaseServiceImpl.selectFIGIMonitoring

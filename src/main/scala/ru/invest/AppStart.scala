@@ -10,12 +10,13 @@ import ru.invest.service.{
   BusinessProcessServiceImpl,
   DataBaseServiceImpl,
   MonitoringServiceImpl,
+  TelegramActorMess,
   TelegramServiceImpl,
   TinkoffRESTServiceImpl
 }
 
 import scala.language.postfixOps
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
@@ -33,15 +34,16 @@ object AppStart extends TaskApp with AppStartHelper {
   override def run(args: List[String]): Task[ExitCode] =
     for {
       api <- apiTask
-      _   <- startTelegramService
       ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
       ms  <- Task { new MonitoringServiceImpl(api) }
+      ta  = system.actorOf(TelegramActorMess(ms)(schedulerTinkoff))
+      _   <- startTelegramService(ta)
       dbs <- Task { new DataBaseServiceImpl }
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms)(schedulerDB, schedulerTinkoff) }
       tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
       _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
       _   <- bu.ubdateTinkoffToolsTable
-    _ <- bu.startMonitoringMyProfil
+      _   = bu.startAllTaskMonitoring().runAsyncAndForget(schedulerDB)
     } yield ExitCode.Success
 }
 
@@ -63,11 +65,14 @@ trait AppStartHelper extends LazyLogging {
     } else {
       Option.empty
     }
-  val startTelegramService: Task[TelegramServiceImpl] = Task {
-    new TelegramServiceImpl(TELEGRAM_TOKEN,
-                            TELEGRAM_NAMEBOT,
-                            TELEGRAM_CHAT_ID,
-                            proxyLogic(TELEGRAM_PROXY, TELEGRAM_HOST),
-                            proxyLogic(TELEGRAM_PROXY, TELEGRAM_PORT))
+
+  val startTelegramService: ActorRef => Task[TelegramServiceImpl] = actor =>
+    Task {
+      new TelegramServiceImpl(TELEGRAM_TOKEN,
+                              TELEGRAM_NAMEBOT,
+                              TELEGRAM_CHAT_ID,
+                              actor,
+                              proxyLogic(TELEGRAM_PROXY, TELEGRAM_HOST),
+                              proxyLogic(TELEGRAM_PROXY, TELEGRAM_PORT))
   }
 }
