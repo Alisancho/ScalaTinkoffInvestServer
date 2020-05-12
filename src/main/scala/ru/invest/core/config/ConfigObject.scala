@@ -10,6 +10,7 @@ object ConfigObject {
   val SERVER_HOST: String               = conf.getString("server.host")
   val SERVER_PORT: Int                  = conf.getInt("server.port")
   val TINKOFF_BROKER_ACCOUNT_ID: String = conf.getString("tinkoff.broker.account.id")
+
   val SCHEDULER_POOL_DB: Int            = conf.getInt("scheduler.pool.db")
   val SCHEDULER_POOL_TINKOFF: Int       = conf.getInt("scheduler.pool.tinkoff")
   val POOL_OPENAPI: Int                 = conf.getInt("pool.openapi")

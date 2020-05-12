@@ -21,7 +21,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl)(schedulerT
 
   private def parsString(s: String): Unit = s match {
     case s if s.startsWith("/start") => {
-      monitoringServiceImpl.startMonitoring(s.replace("/start ", "")).runAsync(_ => ())(schedulerTinkoff)
+      monitoringServiceImpl.startMonitoring(s.replace("/start ", ""))
     }
     case s if s.startsWith("/stop") => {
       monitoringServiceImpl.stopMonitoring(s.replace("/stop ", "")).runAsync(_ => ())(schedulerTinkoff)

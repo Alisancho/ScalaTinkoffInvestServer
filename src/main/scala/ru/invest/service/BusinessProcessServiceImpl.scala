@@ -9,19 +9,19 @@ class BusinessProcessServiceImpl(
     monitoringServiceImpl: MonitoringServiceImpl)(schedulerDB: SchedulerService, schedulerTinkoff: SchedulerService)
     extends LazyLogging {
 
-  def startAllTaskMonitoring(): Task[String] =
+  def startAllTaskMonitoring(): Task[Boolean] =
     (for {
       z <- dataBaseServiceImpl.selectTaskMonitoring
-      b = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi).runAsync(_ => ())(schedulerTinkoff))
-    } yield "").onErrorHandle(p => {
+      b = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
+    } yield true).onErrorHandle(p => {
       logger.error(p.getMessage)
-      "d"
+      false
     })
 
   def statrMonitoring: Task[String] =
     for {
       k <- dataBaseServiceImpl.selectFIGIMonitoring
-      _ = k.foreach(w => monitoringServiceImpl.startMonitoring(w.figi).runAsync(_ => ())(schedulerTinkoff))
+      _ = k.foreach(w => monitoringServiceImpl.startMonitoring(w.figi))
     } yield "OK"
 
   def ubdateTinkoffToolsTable: Task[Boolean] =
@@ -36,11 +36,11 @@ class BusinessProcessServiceImpl(
       _  = ms.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
     } yield true
 
-  def startMonitoringMyProfil: Task[String] =
+  def startMonitoringMyProfil: Task[Boolean] =
     for {
       q <- tinkoffRESTServiceImpl.getPortfolio
       _ = q.positions
         .stream()
-        .forEach(p => monitoringServiceImpl.startMonitoring(p.figi).runAsync(_ => ())(schedulerTinkoff))
-    } yield ""
+        .forEach(p => monitoringServiceImpl.startMonitoring(p.figi))
+    } yield true
 }

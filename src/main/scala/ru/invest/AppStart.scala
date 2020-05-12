@@ -40,10 +40,11 @@ object AppStart extends TaskApp with AppStartHelper {
       _   <- startTelegramService(ta)
       dbs <- Task { new DataBaseServiceImpl }
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms)(schedulerDB, schedulerTinkoff) }
-      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
-      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
-      _   <- bu.ubdateTinkoffToolsTable
+//      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
+//      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
+  //    _   <- bu.ubdateTinkoffToolsTable
       _   = bu.startAllTaskMonitoring().runAsyncAndForget(schedulerDB)
+//    _ <- Task(ms.monitorGraph.run()).onErrorHandle(o => logger.error(o.getMessage))
     } yield ExitCode.Success
 }
 

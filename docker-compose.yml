@@ -9,7 +9,7 @@ services:
       - MYSQL_DATABASE=investdb
       - MYSQL_USER=alisancho
       - MYSQL_PASSWORD=frfw4f434r3f44g
-      - MYSQL_ROOT_PASSWORD=joolpass684523rw3eq3e
+      - MYSQL_ROOT_PASSWORD=c
 #      - TZ=${TIMEZONE}
 #    volumes:
 #      - ./my.cnf:/root/.my.cnf:ro

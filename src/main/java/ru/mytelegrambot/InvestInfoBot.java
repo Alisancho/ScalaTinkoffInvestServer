@@ -1,19 +1,23 @@
 package ru.mytelegrambot;
 
 import akka.actor.ActorRef;
+import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-//@Slf4j
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
     private final String name;
     private final Long chat_id;
     private final ActorRef acctorRef;
 
-    public InvestInfoBot(String token, String name, DefaultBotOptions defaultBotOptions, Long chat_id, ActorRef acctorRef) {
+    public InvestInfoBot(@NotNull String token,
+                         @NotNull String name,
+                         @NotNull DefaultBotOptions defaultBotOptions,
+                         @NotNull Long chat_id,
+                         @NotNull ActorRef acctorRef) {
         super(defaultBotOptions);
         this.token = token;
         this.name = name;
@@ -21,7 +25,10 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         this.acctorRef = acctorRef;
     }
 
-    public InvestInfoBot(String token, String name, Long chat_id, ActorRef acctorRef) {
+    public InvestInfoBot(@NotNull String token,
+                         @NotNull String name,
+                         @NotNull Long chat_id,
+                         @NotNull ActorRef acctorRef) {
         this.token = token;
         this.name = name;
         this.chat_id = chat_id;

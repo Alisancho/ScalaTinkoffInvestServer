@@ -58,6 +58,8 @@ libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
 // https://mvnrepository.com/artifact/org.telegram/telegrambots
 libraryDependencies += "org.telegram" % "telegrambots" % "4.7"
 
+libraryDependencies += "org.jetbrains" % "annotations" % "19.0.0"
+
 lazy val commonSettings = Seq(
   test in assembly := {}
 )
