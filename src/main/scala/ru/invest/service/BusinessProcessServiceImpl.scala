@@ -1,18 +1,23 @@
 package ru.invest.service
+import akka.stream.Materializer
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 
-class BusinessProcessServiceImpl(
-    tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
-    dataBaseServiceImpl: DataBaseServiceImpl,
-    monitoringServiceImpl: MonitoringServiceImpl)(schedulerDB: SchedulerService, schedulerTinkoff: SchedulerService)
+class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
+                                 dataBaseServiceImpl: DataBaseServiceImpl,
+                                 monitoringServiceImpl: MonitoringServiceImpl,
+                                 telegramServiceImpl: TelegramServiceImpl)(schedulerDB: SchedulerService,
+                                                                           schedulerTinkoff: SchedulerService,
+                                                                           materializer: Materializer)
     extends LazyLogging {
 
   def startAllTaskMonitoring(): Task[Boolean] =
     (for {
-      z <- dataBaseServiceImpl.selectTaskMonitoring
-      b = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
+      z  <- dataBaseServiceImpl.selectTaskMonitoring
+      ll = MVarServiceImpl(z)
+      b  = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
+      _  = monitoringServiceImpl.monitorGraph(ll, telegramServiceImpl)(schedulerTinkoff).run()(materializer)
     } yield true).onErrorHandle(p => {
       logger.error(p.getMessage)
       false

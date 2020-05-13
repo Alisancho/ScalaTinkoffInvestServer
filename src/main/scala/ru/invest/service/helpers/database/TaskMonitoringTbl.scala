@@ -1,5 +1,7 @@
 package ru.invest.service.helpers.database
 
+import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
+
 case class TaskMonitoringTbl(taskId: String,
                              figi: String,
                              name: String,
@@ -12,4 +14,8 @@ case class TaskMonitoringTbl(taskId: String,
                              percent: Double,
                              lot: Int)
 
-object TaskMonitoringTbl {}
+object TaskMonitoringTbl {
+  implicit def converter(taskMonitoringTbl:TaskMonitoringTbl,candle:StreamingEvent.Candle):Boolean = {
+    if(taskMonitoringTbl.operation == "Bay")
+  }
+}
