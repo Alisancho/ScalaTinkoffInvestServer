@@ -24,10 +24,11 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl)(schedulerT
       monitoringServiceImpl.startMonitoring(s.replace("/start ", ""))
     }
     case s if s.startsWith("/stop") => {
-      monitoringServiceImpl.stopMonitoring(s.replace("/stop ", "")).runAsync(_ => ())(schedulerTinkoff)
+      monitoringServiceImpl.stopMonitoring(s.replace("/stop ", "")).runAsyncAndForget(schedulerTinkoff)
     }
     case s if s.startsWith("/help") => {}
     case s if s.startsWith("/log")  => {}
+    case _ => log.info("NEW_MESSEND_FROM_TELEGRAM="+ s)
   }
 
 }

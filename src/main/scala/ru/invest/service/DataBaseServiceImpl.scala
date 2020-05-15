@@ -5,13 +5,11 @@ import monix.eval.Task
 import ru.invest.core.config.MyContext
 import ru.invest.service.helpers.database.{FigiMonitoringTbl, TaskMonitoringTbl, TinkoffToolsTbl}
 
-class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging{
+class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
   import ctx._
 
   def selectFIGIMonitoring: Task[List[FigiMonitoringTbl]] = ctx.run(query[FigiMonitoringTbl])
-  def selectTaskMonitoring: Task[List[TaskMonitoringTbl]] = ctx.run(query[TaskMonitoringTbl].filter(
-    l => l.task_status == "ON"))
-
+  def selectTaskMonitoring: Task[List[TaskMonitoringTbl]] = ctx.run(query[TaskMonitoringTbl].filter(l => l.taskStatus == "ON"))
 
   def insertFIGIMonitoring(taskMonitoring: FigiMonitoringTbl): Task[Long] =
     ctx
@@ -50,4 +48,8 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging{
             (t, e) => t.isin             -> e.isin,
           )
       )
+
+  def selectTicker(ticker: String): Task[List[TinkoffToolsTbl]] =
+    ctx.run(query[TinkoffToolsTbl].filter(l => l.figi == lift(ticker)))
+
 }

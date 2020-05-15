@@ -5,17 +5,16 @@ import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
 case class TaskMonitoringTbl(taskId: String,
                              figi: String,
                              name: String,
-                             purchasePrice: BigDecimal,
                              currency: String,
-                             task_status: String,
-                             taskOperation: String,
-                             operation: String,
-                             taskType: String,
+                             purchasePrice: BigDecimal,
+                             purchaseLot: Int,
+                             salePrice: BigDecimal,
+                             saleLot: Int,
                              percent: Double,
-                             lot: Int)
+                             taskOperation: String,
+                             taskType: String,
+                             taskStatus: String)
 
 object TaskMonitoringTbl {
-  implicit def converter(taskMonitoringTbl:TaskMonitoringTbl,candle:StreamingEvent.Candle):Boolean = {
-    if(taskMonitoringTbl.operation == "Bay")
-  }
+
 }

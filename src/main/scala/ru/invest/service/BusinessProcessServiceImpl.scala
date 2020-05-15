@@ -1,8 +1,10 @@
 package ru.invest.service
 import akka.stream.Materializer
 import com.typesafe.scalalogging.LazyLogging
+
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
+
 
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
                                  dataBaseServiceImpl: DataBaseServiceImpl,
@@ -17,7 +19,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
       z  <- dataBaseServiceImpl.selectTaskMonitoring
       ll = MVarServiceImpl(z)
       b  = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
-      _  = monitoringServiceImpl.monitorGraph(ll, telegramServiceImpl)(schedulerTinkoff).run()(materializer)
+      _  = monitoringServiceImpl.mainStream(ll, telegramServiceImpl).run()(materializer)
     } yield true).onErrorHandle(p => {
       logger.error(p.getMessage)
       false
@@ -48,4 +50,5 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
         .stream()
         .forEach(p => monitoringServiceImpl.startMonitoring(p.figi))
     } yield true
+
 }

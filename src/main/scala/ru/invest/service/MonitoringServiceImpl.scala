@@ -12,52 +12,109 @@ import ru.invest.service.helpers.database.TaskMonitoringTbl
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.models.market.CandleInterval
 import ru.tinkoff.invest.openapi.models.streaming.{StreamingEvent, StreamingRequest}
+import ru.invest.core.logger.LoggerMessenger._
 
-class MonitoringServiceImpl(api: OpenApi)(implicit system: ActorSystem) extends LazyLogging {
+import scala.concurrent.Future
+
+class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implicit system: ActorSystem,
+                                                                         schedulerTinkoff: SchedulerService)
+    extends LazyLogging {
   val sharedKillSwitch: SharedKillSwitch = KillSwitches.shared("my-kill-switch")
 
   def startMonitoring(figi: String): Unit =
     api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
 
   def stopMonitoring(figi: String): Task[Unit] = Task {
+    logger.info("STOP=" + figi)
     api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
-  def monitorGraph(mVar: Task[MVar[Task, List[TaskMonitoringTbl]]], telSer: TelegramServiceImpl)(
-      implicit schedulerTinkoff: SchedulerService) =
-    RunnableGraph
-      .fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
-        import GraphDSL.Implicits._
-        val in = Source
-          .fromPublisher(api.getStreamingContext.getEventPublisher)
-        val out = Sink.ignore
-
-        val filter = Flow[StreamingEvent].map({
-          case candle: StreamingEvent.Candle =>
-            (for {
-              q <- mVar
-              o <- q.read
-              _ = logger.info(candle.toString)
-              t = if (o.map(l => l.figi).contains(candle.getFigi))
-                telSer.investBot.sendMessage(o.filter(z => z.figi == candle.getFigi).head.name)
-            } yield candle).runAsyncAndForget
-          case q: StreamingEvent.Orderbook      => q
-          case q: StreamingEvent.InstrumentInfo => q
-          case q: StreamingEvent.Error          => q
-        })
-
-        val f1 = Flow[StreamingEvent].map({
-          case candle: StreamingEvent.Candle => {
-            logger.info(candle.toString)
-            candle
-          }
-          case q: StreamingEvent.Orderbook      => q
-          case q: StreamingEvent.InstrumentInfo => q
-          case q: StreamingEvent.Error          => q
-        })
-
-        in ~> filter ~> out
-        ClosedShape
+  def mainStream(mVar: Task[MVar[Task, List[TaskMonitoringTbl]]], telSer: TelegramServiceImpl): RunnableGraph[NotUsed] =
+    Source
+      .fromPublisher(api.getStreamingContext.getEventPublisher)
+      .filter({
+        case candle: StreamingEvent.Candle => {
+          logger.info(candle.toString)
+          true
+        }
+        case orderbook: StreamingEvent.Orderbook => {
+          logger.warn(orderbook.toString)
+          false
+        }
+        case instrumentInfo: StreamingEvent.InstrumentInfo => {
+          logger.warn(instrumentInfo.toString)
+          false
+        }
+        case error: StreamingEvent.Error => {
+          logger.error(error.getError)
+          false
+        }
       })
+      .mapAsync(parallelism = 1)({
+        case candle: StreamingEvent.Candle => futureTask(mVar, telSer, candle)
+      })
+      .to(Sink.ignore)
 
+  def f1(mVar: Task[MVar[Task, List[TaskMonitoringTbl]]], telSer: TelegramServiceImpl) =
+    Flow[StreamingEvent.Candle].mapAsync(parallelism = 1)({
+      case candle: StreamingEvent.Candle => futureTask(mVar, telSer, candle)
+    })
+
+  def monixTask(mvar: Task[MVar[Task, List[TaskMonitoringTbl]]],
+                telServ: TelegramServiceImpl,
+                candle: StreamingEvent.Candle): Task[Boolean] =
+    for {
+      q <- mvar
+      o <- q.read
+      _ = logger.info(candle.toString)
+      _ = if (o.map(l => l.figi).contains(candle.getFigi) && converter(o.filter(p => p.figi == candle.getFigi).head, candle)) {
+        telServ.investBot.sendMessage(
+          TELEGRAM_MESS(o.filter(z => z.figi == candle.getFigi).head.name, candle.getClosingPrice.toString))
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+      }
+    } yield true
+
+  def futureTask(mvar: Task[MVar[Task, List[TaskMonitoringTbl]]],
+                 telServ: TelegramServiceImpl,
+                 candle: StreamingEvent.Candle): Future[Boolean] =
+    for {
+      q <- mvar.runToFuture(schedulerTinkoff)
+      o <- q.read.runToFuture(schedulerTinkoff)
+      _ = logger.info(candle.toString)
+      _ = if (o.map(l => l.figi).contains(candle.getFigi) && converter(o.filter(p => p.figi == candle.getFigi).head, candle)) {
+        telServ.investBot.sendMessage(
+          TELEGRAM_MESS(o.filter(z => z.figi == candle.getFigi).head.name, candle.getClosingPrice.toString))
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
+      }
+    } yield true
+
+  def converter(taskMonitoringTbl: TaskMonitoringTbl, candle: StreamingEvent.Candle): Boolean = {
+    val percent: (BigDecimal, BigDecimal) => Double = (start, thisis) =>
+      (((thisis * 100) / start) - 100).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue
+    if (taskMonitoringTbl.taskOperation == "Sell" && taskMonitoringTbl.taskType == "PROCENT") {
+      if (taskMonitoringTbl.percent < percent(taskMonitoringTbl.purchasePrice, candle.getClosingPrice))
+        true
+      else
+        false
+    } else if (taskMonitoringTbl.taskOperation == "Sell" && taskMonitoringTbl.taskType == "PRICE") {
+      if (taskMonitoringTbl.salePrice <= candle.getClosingPrice)
+        true
+      else
+        false
+    } else if (taskMonitoringTbl.taskOperation == "Bay" && taskMonitoringTbl.taskType == "PROCENT") {
+      false
+    } else if (taskMonitoringTbl.taskOperation == "Bay" && taskMonitoringTbl.taskType == "PRICE") {
+      false
+    } else {
+      false
+    }
+  }
 }
