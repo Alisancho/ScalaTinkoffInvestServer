@@ -1,5 +1,5 @@
 package ru.invest.service
-
+import scala.util.{Failure, Success}
 import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.stream.{ClosedShape, KillSwitches, SharedKillSwitch}
@@ -80,8 +80,8 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
 
   def futureTask(mvar: Task[MVar[Task, List[TaskMonitoringTbl]]],
                  telServ: TelegramServiceImpl,
-                 candle: StreamingEvent.Candle): Future[Boolean] =
-    for {
+                 candle: StreamingEvent.Candle): Future[_] =
+    (for {
       q <- mvar.runToFuture(schedulerTinkoff)
       o <- q.read.runToFuture(schedulerTinkoff)
       _ = logger.info(candle.toString)
@@ -94,7 +94,9 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
         stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
         stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
       }
-    } yield true
+    } yield "Unit").recover {
+      case e: Throwable => logger.error(e.getMessage)
+    }
 
   def converter(taskMonitoringTbl: TaskMonitoringTbl, candle: StreamingEvent.Candle): Boolean = {
     val percent: (BigDecimal, BigDecimal) => Double = (start, thisis) =>

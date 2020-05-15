@@ -43,8 +43,9 @@ object AppStart extends TaskApp with AppStartHelper {
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms, tel)(schedulerDB, schedulerTinkoff, materialiver) }
 //      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
 //      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
-      _   <- bu.ubdateTinkoffToolsTable
-      _   = bu.startAllTaskMonitoring().runAsyncAndForget(schedulerDB)
+      _ <- bu.ubdateTinkoffToolsTable
+//      _ <- bu.updateTaskMonitoringTbl
+      _ = bu.startAllTaskMonitoring().runAsyncAndForget(schedulerDB)
     } yield ExitCode.Success
 }
 

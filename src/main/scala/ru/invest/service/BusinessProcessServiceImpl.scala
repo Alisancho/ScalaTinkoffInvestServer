@@ -14,22 +14,16 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
                                                                            materializer: Materializer)
     extends LazyLogging {
 
-  def startAllTaskMonitoring(): Task[Boolean] =
+  def startAllTaskMonitoring(): Task[String] =
     (for {
       z  <- dataBaseServiceImpl.selectTaskMonitoring
       ll = MVarServiceImpl(z)
       b  = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
       _  = monitoringServiceImpl.mainStream(ll, telegramServiceImpl).run()(materializer)
-    } yield true).onErrorHandle(p => {
+    } yield "OK").onErrorHandle(p => {
       logger.error(p.getMessage)
-      false
+      "NOT"
     })
-
-  def statrMonitoring: Task[String] =
-    for {
-      k <- dataBaseServiceImpl.selectFIGIMonitoring
-      _ = k.foreach(w => monitoringServiceImpl.startMonitoring(w.figi))
-    } yield "OK"
 
   def ubdateTinkoffToolsTable: Task[Boolean] =
     for {
@@ -42,6 +36,12 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
       _  = me.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
       _  = ms.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
     } yield true
+
+  def updateTaskMonitoringTbl: Task[Boolean] =
+    for{
+      mc <- tinkoffRESTServiceImpl.getPortfolio
+    _ = mc.positions.stream().forEach(o => dataBaseServiceImpl.insertTaskMonitoringTbl(o).runAsyncAndForget(schedulerDB))
+    }yield true
 
   def startMonitoringMyProfil: Task[Boolean] =
     for {

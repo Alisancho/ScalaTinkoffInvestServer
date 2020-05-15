@@ -1,10 +1,3 @@
-CREATE TABLE `investdb`.`figi_monitoring_tbl`
-(
-    `figi` VARCHAR(45) NOT NULL,
-    `name` VARCHAR(128),
-    PRIMARY KEY (`figi`)
-);
-
 CREATE TABLE `investdb`.`tinkoff_tools_tbl`
 (
     `figi`             VARCHAR(45)  NOT NULL,
@@ -19,9 +12,9 @@ CREATE TABLE `investdb`.`tinkoff_tools_tbl`
 
 CREATE TABLE `investdb`.`task_monitoring_tbl`
 (
-    `task_id`        VARCHAR(16)    NOT NULL,
     `figi`           VARCHAR(45)    NOT NULL,
     `name`           VARCHAR(128)   NOT NULL,
+    `ticker`         VARCHAR(45)    NOT NULL,
     `currency`       VARCHAR(8)     NOT NULL,
     `purchase_price` DECIMAL(10, 2) NOT NULL,
     `purchase_lot`   INT UNSIGNED   NOT NULL,
@@ -32,5 +25,5 @@ CREATE TABLE `investdb`.`task_monitoring_tbl`
     `task_type`      VARCHAR(45)    NOT NULL,
     `task_status`    VARCHAR(45)    NOT NULL,
 
-    PRIMARY KEY (`task_id`)
+    PRIMARY KEY (`figi`)
 );

@@ -1,10 +1,11 @@
 package ru.invest.service.helpers.database
 
+import ru.tinkoff.invest.openapi.models.portfolio.Portfolio
 import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
 
-case class TaskMonitoringTbl(taskId: String,
-                             figi: String,
+case class TaskMonitoringTbl(figi: String,
                              name: String,
+                             ticker: String,
                              currency: String,
                              purchasePrice: BigDecimal,
                              purchaseLot: Int,
@@ -16,5 +17,19 @@ case class TaskMonitoringTbl(taskId: String,
                              taskStatus: String)
 
 object TaskMonitoringTbl {
-
+  implicit def convert(l: Portfolio.PortfolioPosition) =
+    TaskMonitoringTbl(
+      figi = l.figi,
+      name = l.name,
+      ticker = l.ticker,
+      currency = l.expectedYield.currency.name(),
+      purchasePrice = l.averagePositionPrice.value,
+      purchaseLot = l.lots,
+      salePrice = l.averagePositionPrice.value,
+      saleLot = l.lots,
+      percent = 10,
+      taskOperation = "Sell",
+      taskType = "PROCENT",
+      taskStatus = "OFF"
+    )
 }
