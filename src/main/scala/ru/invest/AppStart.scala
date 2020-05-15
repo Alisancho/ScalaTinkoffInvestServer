@@ -1,9 +1,7 @@
 package ru.invest
 
-import java.util.concurrent.Executors
 import java.util.logging.Logger
 
-import akka.http.scaladsl.Http
 import cats.effect.ExitCode
 import ru.invest.core.config.ConfigObject._
 import ru.invest.service.{
@@ -22,7 +20,6 @@ import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
-import ru.invest.controllers.TaskController
 import ru.invest.core.config.MyContext
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory

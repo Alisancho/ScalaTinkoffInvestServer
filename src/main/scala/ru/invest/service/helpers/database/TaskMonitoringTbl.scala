@@ -1,7 +1,6 @@
 package ru.invest.service.helpers.database
 
 import ru.tinkoff.invest.openapi.models.portfolio.Portfolio
-import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
 
 case class TaskMonitoringTbl(figi: String,
                              name: String,

@@ -1,9 +1,8 @@
 package ru.invest.service
-import scala.util.{Failure, Success}
-import akka.{Done, NotUsed}
+import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ClosedShape, KillSwitches, SharedKillSwitch}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, Merge, RunnableGraph, Sink, Source}
+import akka.stream.{KillSwitches, SharedKillSwitch}
+import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source}
 import com.typesafe.scalalogging.LazyLogging
 import monix.catnap.MVar
 import monix.eval.Task
