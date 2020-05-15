@@ -62,9 +62,9 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
             (t, e) => t.saleLot       -> e.saleLot,
             (t, e) => t.salePrice     -> e.salePrice,
             (t, e) => t.percent       -> e.percent,
-            (t, e) => t.taskStatus    -> e.taskStatus,
-            (t, e) => t.taskType      -> e.taskType,
-            (t, e) => t.taskOperation -> e.taskOperation,
+            (t, e) => t.taskStatus    -> t.taskStatus,
+            (t, e) => t.taskType      -> t.taskType,
+            (t, e) => t.taskOperation -> t.taskOperation,
           )
       )
 
