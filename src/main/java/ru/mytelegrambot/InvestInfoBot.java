@@ -7,6 +7,8 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.Objects;
+
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
     private final String name;
@@ -37,7 +39,7 @@ public class InvestInfoBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.getMessage() != null && update.getMessage().hasText()) {
+        if (update.getMessage() != null && update.getMessage().hasText() && Objects.equals(update.getMessage().getChatId(), this.chat_id)) {
             try {
                 acctorRef.tell(update.getMessage().getText(), acctorRef);
                 // execute(new SendMessage(chat_id, update.getMessage().getChatId().toString()));

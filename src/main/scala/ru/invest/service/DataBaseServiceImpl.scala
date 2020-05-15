@@ -68,7 +68,8 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
           )
       )
 
-  def selectTicker(ticker: String): Task[List[TinkoffToolsTbl]] =
-    ctx.run(query[TinkoffToolsTbl].filter(l => l.figi == lift(ticker)))
-
+  def selectFIGIFromTicker(ticker: String): Task[String] =
+    for {
+      z <- ctx.run(query[TinkoffToolsTbl].filter(l => l.ticker == lift(ticker)))
+    } yield z.head.figi
 }

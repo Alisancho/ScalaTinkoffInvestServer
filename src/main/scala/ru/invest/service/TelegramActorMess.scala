@@ -5,11 +5,16 @@ import akka.event.{Logging, LoggingAdapter}
 import monix.execution.schedulers.SchedulerService
 
 object TelegramActorMess {
-  def apply(monitoringServiceImpl: MonitoringServiceImpl)(schedulerTinkoff:SchedulerService): Props =
-    Props(new TelegramActorMess(monitoringServiceImpl)(schedulerTinkoff))
+  def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
+      schedulerTinkoff: SchedulerService,
+      schedulerDB: SchedulerService): Props =
+    Props(new TelegramActorMess(monitoringServiceImpl, dataBaseServiceImpl)(schedulerTinkoff, schedulerDB))
 }
 
-class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl)(schedulerTinkoff:SchedulerService) extends Actor {
+class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
+    schedulerTinkoff: SchedulerService,
+    schedulerDB: SchedulerService)
+    extends Actor {
   val log: LoggingAdapter = Logging(context.system, this)
   def receive: Receive = {
     case a: String => {
@@ -20,15 +25,17 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl)(schedulerT
   }
 
   private def parsString(s: String): Unit = s match {
-    case s if s.startsWith("/start") => {
-      monitoringServiceImpl.startMonitoring(s.replace("/start ", ""))
-    }
+    case s if s.startsWith("/start") =>
+      (for {
+        p <- dataBaseServiceImpl.selectFIGIFromTicker(s.replace("/start ", ""))
+        _ <- monitoringServiceImpl.startMonitoring(p)
+      } yield ()).onErrorHandle(o => log.error(o.getMessage)).runAsyncAndForget(schedulerDB)
     case s if s.startsWith("/stop") => {
       monitoringServiceImpl.stopMonitoring(s.replace("/stop ", "")).runAsyncAndForget(schedulerTinkoff)
     }
     case s if s.startsWith("/help") => {}
     case s if s.startsWith("/log")  => {}
-    case _ => log.info("NEW_MESSEND_FROM_TELEGRAM="+ s)
+    case _                          => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
 }

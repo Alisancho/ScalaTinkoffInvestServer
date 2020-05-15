@@ -32,11 +32,11 @@ object AppStart extends TaskApp with AppStartHelper {
   override def run(args: List[String]): Task[ExitCode] =
     for {
       api <- apiTask
+      dbs <- Task { new DataBaseServiceImpl }
       ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
       ms  <- Task { new MonitoringServiceImpl(api)(schedulerDB) }
-      ta  = system.actorOf(TelegramActorMess(ms)(schedulerTinkoff))
+      ta  = system.actorOf(TelegramActorMess(ms, dbs)(schedulerTinkoff, schedulerDB))
       tel <- startTelegramService(ta)
-      dbs <- Task { new DataBaseServiceImpl }
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms, tel)(schedulerDB, schedulerTinkoff, materialiver) }
 //      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
 //      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
