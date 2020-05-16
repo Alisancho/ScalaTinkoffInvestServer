@@ -5,10 +5,6 @@ version := "0.1"
 
 scalaVersion := "2.13.2"
 
-libraryDependencies += "ru.tinkoff.invest" % "openapi-java-sdk-core"    % "0.4.1"
-libraryDependencies += "ru.tinkoff.invest" % "openapi-java-sdk"         % "0.4.1" pomOnly ()
-libraryDependencies += "ru.tinkoff.invest" % "openapi-java-sdk-example" % "0.4.1"
-
 lazy val akkaVersion       = "2.6.4"
 lazy val akkaHTTP          = "10.1.11"
 lazy val logBackVersion    = "1.2.3"
@@ -16,6 +12,8 @@ lazy val catsVersion       = "2.0.0"
 lazy val catsEffectVersion = "2.0.0"
 lazy val fs2Version        = "2.0.1"
 lazy val quillVersion      = "3.4.10"
+lazy val softwaremill      = "2.3.3"
+lazy val tinkoffapi        = "0.4.1"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka"    %% "akka-actor"              % akkaVersion,
@@ -33,29 +31,34 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.typelevel" %% "cats-core"   % catsVersion,
+  "com.softwaremill.macwire" %% "macrosakka" % softwaremill % "provided",
+  "com.softwaremill.macwire" %% "macros" % softwaremill % "provided",
+  "com.softwaremill.macwire" %% "proxy" % softwaremill,
+  "com.softwaremill.macwire" %% "util" % softwaremill
+)
+
+libraryDependencies ++= Seq(
+  "ru.tinkoff.invest" % "openapi-java-sdk" % tinkoffapi pomOnly(),
+  "ru.tinkoff.invest" % "openapi-java-sdk-example" % tinkoffapi,
+  "ru.tinkoff.invest" % "openapi-java-sdk-core" % tinkoffapi
+)
+
+libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-effect" % catsEffectVersion,
+  "org.typelevel" %% "cats-core"   % catsVersion,
   "co.fs2"        %% "fs2-core"    % fs2Version,
   "co.fs2"        %% "fs2-io"      % fs2Version
 )
 
 libraryDependencies ++= Seq(
-  "io.getquill" %% "quill-sql"           % quillVersion,
-  "io.getquill" %% "quill-core"          % quillVersion,
-  "io.getquill" %% "quill-jdbc-monix"    % quillVersion,
-  "mysql"       % "mysql-connector-java" % "8.0.18"
+  "io.getquill" %% "quill-jdbc-monix" % quillVersion,
+  "io.getquill" %% "quill-core" % quillVersion,
+  "io.getquill" %% "quill-sql" % quillVersion,
+  "mysql" % "mysql-connector-java" % "8.0.18"
 )
-libraryDependencies += "com.softwaremill.macwire" %% "macros" % "2.3.3" % "provided"
-
-libraryDependencies += "com.softwaremill.macwire" %% "macrosakka" % "2.3.3" % "provided"
-
-libraryDependencies += "com.softwaremill.macwire" %% "util" % "2.3.3"
-
-libraryDependencies += "com.softwaremill.macwire" %% "proxy" % "2.3.3"
 
 libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
 
-// https://mvnrepository.com/artifact/org.telegram/telegrambots
 libraryDependencies += "org.telegram" % "telegrambots" % "4.7"
 
 libraryDependencies += "org.jetbrains" % "annotations" % "19.0.0"
