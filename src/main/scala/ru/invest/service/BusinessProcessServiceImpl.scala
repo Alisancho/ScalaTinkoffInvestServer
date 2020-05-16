@@ -18,7 +18,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
     (for {
       z  <- dataBaseServiceImpl.selectTaskMonitoring
       ll = MVarServiceImpl(z)
-      _  = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi).runAsyncAndForget(schedulerTinkoff))
+      _  = z.foreach(o => monitoringServiceImpl.startMonitoring(o.figi))
       _  = monitoringServiceImpl.mainStream(ll, telegramServiceImpl).run()(materializer)
     } yield "OK").onErrorHandle(p => {
       logger.error(p.getMessage)
