@@ -17,7 +17,7 @@ class TaskController(businessProcessServiceImpl: BusinessProcessServiceImpl)(sch
       } ~ path("startMonitoring") {
         get {
           entity(as[HttpRequest]) { p =>
-            complete(businessProcessServiceImpl.startAllTaskMonitoring().runToFuture(schedulerTinkoff))
+           complete("")
           }
         }
       }
