@@ -20,7 +20,9 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
     extends LazyLogging {
   val sharedKillSwitch: SharedKillSwitch = KillSwitches.shared("my-kill-switch")
 
-  def startMonitoring(figi: String):Unit= api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
+  def startMonitoring(figi: String): Task[Unit] = Task {
+    api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
+  }
 
   def stopMonitoring(figi: String): Task[Unit] = Task {
     api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
@@ -66,7 +68,7 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
       _ = logger.info(candle.toString)
       _ = if (o.map(l => l.figi).contains(candle.getFigi) && converter(o.filter(p => p.figi == candle.getFigi).head, candle)) {
         telServ.investBot.sendMessage(
-          TELEGRAM_MESS(o.filter(z => z.figi == candle.getFigi).head.name, candle.getClosingPrice.toString))
+          TELEGRAM_MESS(o.filter(z => z.figi == candle.getFigi).head, candle))
         stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
         stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
         stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)

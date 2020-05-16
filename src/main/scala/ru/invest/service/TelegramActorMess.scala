@@ -2,8 +2,12 @@ package ru.invest.service
 
 import akka.actor.{Actor, Props}
 import akka.event.{Logging, LoggingAdapter}
+import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-import ru.invest.service.helpers.database.TinkoffToolsTbl
+import ru.invest.core.config.PureFunction
+
+import ru.invest.service.helpers.database.{BDInvest, TinkoffToolsTbl}
+import ru.invest.core.logger.LoggerMessenger
 import ru.mytelegrambot.InvestInfoBot
 
 object TelegramActorMess {
@@ -20,54 +24,33 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     schedulerDB: SchedulerService)
     extends Actor {
   val log: LoggingAdapter = Logging(context.system, this)
+
   def receive: Receive = {
-    case mes: String => {
-      log.info("NEW_MESSEND_FROM_TELEGRAM=" + mes)
-      parsString(mes)
-    }
-    case mes: TelegramContainerMess => {
-      log.info("NEW_MESSEND_FROM_TELEGRAM=" + mes.mess)
-      parsString(mes)
-    }
-    case error => log.error("ERROR_Receive=" + error.toString)
+    case mes: TelegramContainerMess => parsStringd(mes)
+    case error                      => log.error("ERROR_Receive=" + error.toString)
   }
 
-  private def parsString(s: String): Unit = s match {
-    case s if s.startsWith("/start") =>
-      (for {
-        p <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.replace("/start ", ""))
-        e = p.fold(localError, tinkoffToolsTbl)
-      } yield ()).onErrorHandle(o => log.error(o.getMessage)).runAsyncAndForget(schedulerDB)
-    case s if s.startsWith("/stop") => {
-      monitoringServiceImpl.stopMonitoring(s.replace("/stop ", "")).runAsyncAndForget(schedulerTinkoff)
-    }
-    case s if s.startsWith("/help") => {}
-    case s if s.startsWith("/log")  => {}
-    case _                          => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
-  }
-
-  private def parsString(s: TelegramContainerMess): Unit = s match {
+  private def parsStringd(s: TelegramContainerMess): Unit = s match {
     case s if s.mess.startsWith("/start") =>
-      (for {
-        p <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.mess.replace("/start ", ""))
-        e = p.fold(localError, tinkoffToolsTbl)
-        _ = log.info(e)
-        _ = s.investInfoBot.sendMessage(e)
-      } yield ()).onErrorHandle(o => log.error(o.getMessage)).runAsyncAndForget(schedulerDB)
-    case s if s.mess.startsWith("/stop") => {
-      monitoringServiceImpl.stopMonitoring(s.mess.replace("/stop ", "")).runAsyncAndForget(schedulerTinkoff)
-    }
-    case s if s.mess.startsWith("/help") => {}
-    case s if s.mess.startsWith("/log")  => {}
-    case _                               => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
+      taskForFigi(s.copy(s.mess.replace("/start ", "")))(monitoringServiceImpl.startMonitoring,
+                                                         LoggerMessenger.TELEGRAM_RECUEST_OK).runAsyncAndForget(schedulerDB)
+    case s if s.mess.startsWith("/stop") =>
+    // taskForFigi(s.copy(s.mess.replace("/stop ", "")))(monitoringServiceImpl.stopMonitoring,).runAsyncAndForget(schedulerDB)
+    case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
-  private val localError: Throwable => String = i => "ERROR_MESSAG " + i.getMessage
-
-
-  private val tinkoffToolsTbl: TinkoffToolsTbl => String = i => {
-    monitoringServiceImpl.startMonitoring(i.figi)
-    "Отправлен запрос на мониторинг " + i.name + " " + i.ticker + " " + i.figi + " "
-  }
+  private def taskForFigi(s: TelegramContainerMess)(f: String => Task[_], l: (BDInvest, String) => String): Task[_] =
+    (for {
+      taskid <- PureFunction.getUUID
+      _      = log.info("NEW_MESSAGE_FROM_TELEGTAM=" + s.mess)
+      p      <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.mess.replace("/start ", ""))
+      _      <- f(p.figi)
+      mess   = l(p, taskid)
+      _      = log.info(mess)
+    } yield s.investInfoBot.sendMessage(mess))
+      .onErrorHandle(o => {
+        log.error(o.getMessage)
+        s.investInfoBot.sendMessage(o.getMessage)
+      })
 
 }

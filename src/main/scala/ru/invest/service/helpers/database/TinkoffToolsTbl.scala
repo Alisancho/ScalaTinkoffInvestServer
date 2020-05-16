@@ -8,7 +8,7 @@ case class TinkoffToolsTbl(figi: String,
                            ticker: String,
                            isin: String,
                            instruments_type: String,
-                           lot: Int)
+                           lot: Int) extends BDInvest
 
 object TinkoffToolsTbl {
   implicit def convertToTinkoffTools(instrument: Instrument): TinkoffToolsTbl = TinkoffToolsTbl(

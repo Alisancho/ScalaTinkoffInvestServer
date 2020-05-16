@@ -77,17 +77,17 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
   private val selectFIGIFromFigi: String => Task[List[TinkoffToolsTbl]] = ticker =>
     ctx.run(query[TinkoffToolsTbl].filter(l => l.figi == lift(ticker)))
 
-  val selectTinkoffToolsTbl: String => Task[Either[Throwable, TinkoffToolsTbl]] = name =>
+  val selectTinkoffToolsTbl: String => Task[TinkoffToolsTbl] = name =>
     Task.parZip3(selectFIGIFromFigi(name), selectFIGIFromName(name), selectFIGIFromTicker(name)).map {
       case (fromFigi, fromName, tromTicker) => {
         if (fromFigi.nonEmpty) {
-          Right(fromFigi.head)
+          fromFigi.head
         } else if (fromName.nonEmpty) {
-          Right(fromName.head)
+          fromName.head
         } else if (tromTicker.nonEmpty) {
-          Right(tromTicker.head)
+          tromTicker.head
         } else {
-          Left(new RuntimeException("В базе нет значения " + name))
+          throw new RuntimeException("В базе нет значения " + name)
         }
       }
   }

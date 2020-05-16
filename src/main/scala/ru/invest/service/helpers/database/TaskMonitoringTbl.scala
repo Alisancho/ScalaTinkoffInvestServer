@@ -13,7 +13,7 @@ case class TaskMonitoringTbl(figi: String,
                              percent: Double,
                              taskOperation: String,
                              taskType: String,
-                             taskStatus: String)
+                             taskStatus: String) extends BDInvest
 
 object TaskMonitoringTbl {
   implicit def convert(l: Portfolio.PortfolioPosition) =

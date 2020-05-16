@@ -32,15 +32,15 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "com.softwaremill.macwire" %% "macrosakka" % softwaremill % "provided",
-  "com.softwaremill.macwire" %% "macros" % softwaremill % "provided",
-  "com.softwaremill.macwire" %% "proxy" % softwaremill,
-  "com.softwaremill.macwire" %% "util" % softwaremill
+  "com.softwaremill.macwire" %% "macros"     % softwaremill % "provided",
+  "com.softwaremill.macwire" %% "proxy"      % softwaremill,
+  "com.softwaremill.macwire" %% "util"       % softwaremill
 )
 
 libraryDependencies ++= Seq(
-  "ru.tinkoff.invest" % "openapi-java-sdk" % tinkoffapi pomOnly(),
+  "ru.tinkoff.invest" % "openapi-java-sdk"         % tinkoffapi pomOnly(),
   "ru.tinkoff.invest" % "openapi-java-sdk-example" % tinkoffapi,
-  "ru.tinkoff.invest" % "openapi-java-sdk-core" % tinkoffapi
+  "ru.tinkoff.invest" % "openapi-java-sdk-core"    % tinkoffapi
 )
 
 libraryDependencies ++= Seq(
@@ -52,9 +52,9 @@ libraryDependencies ++= Seq(
 
 libraryDependencies ++= Seq(
   "io.getquill" %% "quill-jdbc-monix" % quillVersion,
-  "io.getquill" %% "quill-core" % quillVersion,
-  "io.getquill" %% "quill-sql" % quillVersion,
-  "mysql" % "mysql-connector-java" % "8.0.18"
+  "io.getquill" %% "quill-core"       % quillVersion,
+  "io.getquill" %% "quill-sql"        % quillVersion,
+  "mysql" % "mysql-connector-java"    % "8.0.18"
 )
 
 libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
