@@ -6,7 +6,7 @@ import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 import ru.invest.core.config.PureFunction
 
-import ru.invest.service.helpers.database.{BDInvest, TinkoffToolsTbl}
+import ru.invest.service.helpers.database.BDInvest
 import ru.invest.core.logger.LoggerMessenger
 import ru.mytelegrambot.InvestInfoBot
 
@@ -26,24 +26,27 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
   val log: LoggingAdapter = Logging(context.system, this)
 
   def receive: Receive = {
-    case mes: TelegramContainerMess => parsStringd(mes)
-    case error                      => log.error("ERROR_Receive=" + error.toString)
+    case mes: TelegramContainerMess => {
+      log.info("NEW_MESSAGE_FROM_TELEGTAM=" + mes.mess)
+      parsStringd(mes)
+    }
+    case error => log.error("ERROR_Receive=" + error.toString)
   }
 
   private def parsStringd(s: TelegramContainerMess): Unit = s match {
     case s if s.mess.startsWith("/start") =>
       taskForFigi(s.copy(s.mess.replace("/start ", "")))(monitoringServiceImpl.startMonitoring,
-                                                         LoggerMessenger.TELEGRAM_RECUEST_OK).runAsyncAndForget(schedulerDB)
+                                                         LoggerMessenger.TELEGRAM_RECUEST_START).runAsyncAndForget(schedulerDB)
     case s if s.mess.startsWith("/stop") =>
-    // taskForFigi(s.copy(s.mess.replace("/stop ", "")))(monitoringServiceImpl.stopMonitoring,).runAsyncAndForget(schedulerDB)
+      taskForFigi(s.copy(s.mess.replace("/stop ", "")))(monitoringServiceImpl.startMonitoring,
+                                                         LoggerMessenger.TELEGRAM_RECUEST_STOP).runAsyncAndForget(schedulerDB)
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
   private def taskForFigi(s: TelegramContainerMess)(f: String => Task[_], l: (BDInvest, String) => String): Task[_] =
     (for {
       taskid <- PureFunction.getUUID
-      _      = log.info("NEW_MESSAGE_FROM_TELEGTAM=" + s.mess)
-      p      <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.mess.replace("/start ", ""))
+      p      <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.mess)
       _      <- f(p.figi)
       mess   = l(p, taskid)
       _      = log.info(mess)

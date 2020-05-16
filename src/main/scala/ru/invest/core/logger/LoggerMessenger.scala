@@ -9,9 +9,9 @@ object LoggerMessenger {
        |FIGI = ${bDInvest.figi}
        |NAME = ${bDInvest.name}
        |TICKER = ${bDInvest.ticker}
-       |
        |""".stripMargin
-  val TELEGRAM_RECUEST_OK: (BDInvest, String) => String          = (mess, taskID) => s"""
+
+  val TELEGRAM_RECUEST_START: (BDInvest, String) => String       = (mess, taskID) => s"""
        |Отправлен запрос на мониторинг:
        |FIGI = ${mess.figi}
        |NAME = ${mess.name}
@@ -19,5 +19,11 @@ object LoggerMessenger {
        |TASK_ID = $taskID
        |""".stripMargin
 
-  val TELEGRAM_RECUEST_ERROR: BDInvest => String = error => "Ошибка " + error
+  val TELEGRAM_RECUEST_STOP: (BDInvest, String) => String = (mess, taskID) => s"""
+       |Отправлен запрос на остановку мониторинга:
+       |FIGI = ${mess.figi}
+       |NAME = ${mess.name}
+       |TICKER = ${mess.ticker}
+       |TASK_ID = $taskID
+       |""".stripMargin
 }
