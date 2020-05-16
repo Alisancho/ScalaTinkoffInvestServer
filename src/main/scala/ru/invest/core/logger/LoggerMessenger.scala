@@ -11,7 +11,7 @@ object LoggerMessenger {
        |TICKER = ${bDInvest.ticker}
        |""".stripMargin
 
-  val TELEGRAM_RECUEST_START: (BDInvest, String) => String       = (mess, taskID) => s"""
+  val TELEGRAM_RESPONSE_START: (BDInvest, String) => String       = (mess, taskID) => s"""
        |Отправлен запрос на мониторинг:
        |FIGI = ${mess.figi}
        |NAME = ${mess.name}
@@ -19,7 +19,7 @@ object LoggerMessenger {
        |TASK_ID = $taskID
        |""".stripMargin
 
-  val TELEGRAM_RECUEST_STOP: (BDInvest, String) => String = (mess, taskID) => s"""
+  val TELEGRAM_RESPONSE_STOP: (BDInvest, String) => String = (mess, taskID) => s"""
        |Отправлен запрос на остановку мониторинга:
        |FIGI = ${mess.figi}
        |NAME = ${mess.name}

@@ -36,10 +36,10 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
   private def parsStringd(s: TelegramContainerMess): Unit = s match {
     case s if s.mess.startsWith("/start") =>
       taskForFigi(s.copy(s.mess.replace("/start ", "")))(monitoringServiceImpl.startMonitoring,
-                                                         LoggerMessenger.TELEGRAM_RECUEST_START).runAsyncAndForget(schedulerDB)
+                                                         LoggerMessenger.TELEGRAM_RESPONSE_START).runAsyncAndForget(schedulerDB)
     case s if s.mess.startsWith("/stop") =>
       taskForFigi(s.copy(s.mess.replace("/stop ", "")))(monitoringServiceImpl.startMonitoring,
-                                                         LoggerMessenger.TELEGRAM_RECUEST_STOP).runAsyncAndForget(schedulerDB)
+                                                         LoggerMessenger.TELEGRAM_RESPONSE_STOP).runAsyncAndForget(schedulerDB)
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
