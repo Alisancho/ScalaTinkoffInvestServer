@@ -1,19 +1,37 @@
 package ru.mytelegrambot;
 
 import akka.actor.ActorRef;
+import cats.data.Ior;
+import monix.eval.Task;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.invest.service.TelegramContainerMess;
+import scala.Function2;
+import scala.Unit;
+import scala.util.Either;
+import scala.util.Left;
+import scala.util.Right;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
     private final String name;
     private final Long chat_id;
     private final ActorRef acctorRef;
+    Function2<String, String, Either<Throwable, String>> fun = (chat_id, mess) -> {
+        try {
+            execute(new SendMessage(chat_id, mess));
+            return Right.apply("");
+        } catch (TelegramApiException e) {
+            return Left.apply(e);
+        }
+    };
 
     public InvestInfoBot(@NotNull String token,
                          @NotNull String name,
@@ -41,13 +59,13 @@ public class InvestInfoBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.getMessage() != null && update.getMessage().hasText() && Objects.equals(update.getMessage().getChatId(), this.chat_id)) {
             try {
-                acctorRef.tell(update.getMessage().getText(), acctorRef);
-                // execute(new SendMessage(chat_id, update.getMessage().getChatId().toString()));
-            } catch (Throwable e) {
+                acctorRef.tell(TelegramContainerMess.apply(update.getMessage().getText(), this), acctorRef);
+            } catch (Throwable ignored) {
 
             }
         }
     }
+
 
     @Override
     public String getBotUsername() {
@@ -63,7 +81,6 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         try {
             execute(new SendMessage(chat_id, mess));
         } catch (Throwable ignored) {
-            //log.error(ignored.getMessage());
         }
     }
 

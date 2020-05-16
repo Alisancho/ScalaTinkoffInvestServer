@@ -23,7 +23,6 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
   def startMonitoring(figi: String):Unit= api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
 
   def stopMonitoring(figi: String): Task[Unit] = Task {
-    logger.info("STOP=" + figi)
     api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
@@ -57,24 +56,6 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
     Flow[StreamingEvent.Candle].mapAsync(parallelism = 1)({
       case candle: StreamingEvent.Candle => futureTask(mVar, telSer, candle)
     })
-
-  def monixTask(mvar: Task[MVar[Task, List[TaskMonitoringTbl]]],
-                telServ: TelegramServiceImpl,
-                candle: StreamingEvent.Candle): Task[Boolean] =
-    for {
-      q <- mvar
-      o <- q.read
-      _ = logger.info(candle.toString)
-      _ = if (o.map(l => l.figi).contains(candle.getFigi) && converter(o.filter(p => p.figi == candle.getFigi).head, candle)) {
-        telServ.investBot.sendMessage(
-          TELEGRAM_MESS(o.filter(z => z.figi == candle.getFigi).head.name, candle.getClosingPrice.toString))
-        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
-        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
-        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
-        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
-        stopMonitoring(candle.getFigi).runSyncStep(schedulerDB)
-      }
-    } yield true
 
   def futureTask(mvar: Task[MVar[Task, List[TaskMonitoringTbl]]],
                  telServ: TelegramServiceImpl,

@@ -87,7 +87,7 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
         } else if (tromTicker.nonEmpty) {
           Right(tromTicker.head)
         } else {
-          Left(new RuntimeException("Нет данных в базе"))
+          Left(new RuntimeException("В базе нет значения " + name))
         }
       }
   }
