@@ -11,6 +11,8 @@ import ru.invest.core.logger.LoggerMessenger
 import ru.mytelegrambot.InvestInfoBot
 
 object TelegramActorMess {
+  val START: String = "/start"
+  val STOP: String  = "/stop"
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
       schedulerDB: SchedulerService): Props =
@@ -23,6 +25,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     schedulerTinkoff: SchedulerService,
     schedulerDB: SchedulerService)
     extends Actor {
+  import TelegramActorMess._
   val log: LoggingAdapter = Logging(context.system, this)
 
   def receive: Receive = {
@@ -34,11 +37,12 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
   }
 
   private def parsStringd(s: TelegramContainerMess): Unit = s match {
-    case s if s.mess.startsWith("/start") =>
-      taskForFigi(s.copy(s.mess.replace("/start ", "")))(monitoringServiceImpl.startMonitoring,
-                                                         LoggerMessenger.TELEGRAM_RESPONSE_START).runAsyncAndForget(schedulerDB)
-    case s if s.mess.startsWith("/stop") =>
-      taskForFigi(s.copy(s.mess.replace("/stop ", "")))(monitoringServiceImpl.startMonitoring,
+    case s if s.mess.startsWith(START) =>
+      taskForFigi(s.copy(s.mess.replace(s"$START ", "")))(
+        monitoringServiceImpl.startMonitoring,
+        LoggerMessenger.TELEGRAM_RESPONSE_START).runAsyncAndForget(schedulerDB)
+    case s if s.mess.startsWith(STOP) =>
+      taskForFigi(s.copy(s.mess.replace(s"$STOP ", "")))(monitoringServiceImpl.startMonitoring,
                                                          LoggerMessenger.TELEGRAM_RESPONSE_STOP).runAsyncAndForget(schedulerDB)
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }

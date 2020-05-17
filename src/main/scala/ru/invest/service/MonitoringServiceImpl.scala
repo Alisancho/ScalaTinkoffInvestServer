@@ -82,6 +82,7 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
   def converter(taskMonitoringTbl: TaskMonitoringTbl, candle: StreamingEvent.Candle): Boolean = {
     val percent: (BigDecimal, BigDecimal) => Double = (start, thisis) =>
       (((thisis * 100) / start) - 100).setScale(2, BigDecimal.RoundingMode.HALF_UP).doubleValue
+
     if (taskMonitoringTbl.taskOperation == "Sell" && taskMonitoringTbl.taskType == "PROCENT") {
       if (taskMonitoringTbl.percent < percent(taskMonitoringTbl.purchasePrice, candle.getClosingPrice))
         true
@@ -93,9 +94,15 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
       else
         false
     } else if (taskMonitoringTbl.taskOperation == "Bay" && taskMonitoringTbl.taskType == "PROCENT") {
-      false
+      if (taskMonitoringTbl.percent > percent(taskMonitoringTbl.salePrice, candle.getClosingPrice))
+        true
+      else
+        false
     } else if (taskMonitoringTbl.taskOperation == "Bay" && taskMonitoringTbl.taskType == "PRICE") {
-      false
+      if (taskMonitoringTbl.purchasePrice < candle.getClosingPrice)
+        true
+      else
+        false
     } else {
       false
     }

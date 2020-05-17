@@ -42,7 +42,7 @@ object AppStart extends TaskApp with AppStartHelper {
 //      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
       _ <- bu.ubdateTinkoffToolsTable
       _ <- bu.updateTaskMonitoringTbl
-      _ = bu.startAllTaskMonitoring().runAsyncAndForget(schedulerDB)
+      _ = bu.startAllTaskMonitoring.runAsyncAndForget(schedulerDB)
     } yield ExitCode.Success
 }
 

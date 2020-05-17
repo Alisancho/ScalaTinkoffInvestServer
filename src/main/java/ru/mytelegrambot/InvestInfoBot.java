@@ -1,8 +1,6 @@
 package ru.mytelegrambot;
 
 import akka.actor.ActorRef;
-import cats.data.Ior;
-import monix.eval.Task;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -11,13 +9,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.invest.service.TelegramContainerMess;
 import scala.Function2;
-import scala.Unit;
 import scala.util.Either;
 import scala.util.Left;
 import scala.util.Right;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 public class InvestInfoBot extends TelegramLongPollingBot {
     private final String token;
@@ -66,7 +62,6 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         }
     }
 
-
     @Override
     public String getBotUsername() {
         return name;
@@ -83,6 +78,4 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         } catch (Throwable ignored) {
         }
     }
-
-
 }

@@ -14,7 +14,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
                                                                            materializer: Materializer)
     extends LazyLogging {
 
-  def startAllTaskMonitoring(): Task[_] =
+  def startAllTaskMonitoring: Task[_] =
     (for {
       z  <- dataBaseServiceImpl.selectTaskMonitoring
       ll = MVarServiceImpl(z)
