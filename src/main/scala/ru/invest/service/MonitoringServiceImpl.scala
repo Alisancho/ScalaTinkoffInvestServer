@@ -89,7 +89,7 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
       else
         false
     } else if (taskMonitoringTbl.taskOperation == "Sell" && taskMonitoringTbl.taskType == "PRICE") {
-      if (taskMonitoringTbl.salePrice <= candle.getClosingPrice)
+      if (taskMonitoringTbl.salePrice < candle.getClosingPrice)
         true
       else
         false
