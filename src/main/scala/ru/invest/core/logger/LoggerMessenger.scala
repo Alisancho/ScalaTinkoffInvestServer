@@ -1,6 +1,6 @@
 package ru.invest.core.logger
 
-import ru.invest.service.helpers.database.BDInvest
+import ru.invest.entity.database.BDInvest
 import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
 
 object LoggerMessenger {
@@ -11,7 +11,7 @@ object LoggerMessenger {
        |TICKER = ${bDInvest.ticker}
        |""".stripMargin
 
-  val TELEGRAM_RESPONSE_START: (BDInvest, String) => String       = (mess, taskID) => s"""
+  val TELEGRAM_RESPONSE_START: (BDInvest, String) => String = (mess, taskID) => s"""
        |Отправлен запрос на мониторинг:
        |FIGI = ${mess.figi}
        |NAME = ${mess.name}
@@ -26,4 +26,12 @@ object LoggerMessenger {
        |TICKER = ${mess.ticker}
        |TASK_ID = $taskID
        |""".stripMargin
+
+  val TELEGRAM_RESPONSE_ADD: (BDInvest, String) => String = (mess, taskID) => s"""
+      |Создан новый task для мониторинга:
+      |FIGI = ${mess.figi}
+      |NAME = ${mess.name}
+      |TICKER = ${mess.ticker}
+      |TASK_ID = $taskID
+      |""".stripMargin
 }

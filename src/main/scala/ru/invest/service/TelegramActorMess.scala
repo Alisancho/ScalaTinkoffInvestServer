@@ -4,10 +4,9 @@ import akka.actor.{Actor, Props}
 import akka.event.{Logging, LoggingAdapter}
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-import ru.invest.core.config.PureFunction
-
-import ru.invest.service.helpers.database.BDInvest
+import ru.invest.core.functions.PureFunction
 import ru.invest.core.logger.LoggerMessenger
+import ru.invest.entity.database.BDInvest
 import ru.mytelegrambot.InvestInfoBot
 
 object TelegramActorMess {

@@ -1,4 +1,4 @@
-package ru.invest.service.helpers.database
+package ru.invest.entity.database
 
 import ru.tinkoff.invest.openapi.models.market.Instrument
 

@@ -1,4 +1,4 @@
-package ru.invest.core.config
+package ru.invest.core.context
 
 import java.time.Instant
 import java.util.Date

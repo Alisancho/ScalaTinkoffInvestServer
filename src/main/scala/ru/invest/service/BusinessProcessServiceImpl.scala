@@ -1,10 +1,9 @@
 package ru.invest.service
 import akka.stream.Materializer
 import com.typesafe.scalalogging.LazyLogging
-
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-
+import ru.invest.entity.database.TaskMonitoringTbl
 
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
                                  dataBaseServiceImpl: DataBaseServiceImpl,
@@ -37,9 +36,9 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
     } yield ()
 
   def updateTaskMonitoringTbl: Task[_] =
-    for{
+    for {
       mc <- tinkoffRESTServiceImpl.getPortfolio
-    _ = mc.positions.stream().forEach(o => dataBaseServiceImpl.insertTaskMonitoringTbl(o).runAsyncAndForget(schedulerDB))
-    }yield ()
+      _  = mc.positions.stream().forEach(o => dataBaseServiceImpl.insertTaskMonitoringTbl(o).runAsyncAndForget(schedulerDB))
+    } yield ()
 
 }

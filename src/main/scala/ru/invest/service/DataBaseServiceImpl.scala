@@ -2,8 +2,8 @@ package ru.invest.service
 
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
-import ru.invest.core.config.MyContext
-import ru.invest.service.helpers.database.{TaskMonitoringTbl, TinkoffToolsTbl}
+import ru.invest.core.context.MyContext
+import ru.invest.entity.database.{TaskMonitoringTbl, TinkoffToolsTbl}
 
 class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
   import ctx._

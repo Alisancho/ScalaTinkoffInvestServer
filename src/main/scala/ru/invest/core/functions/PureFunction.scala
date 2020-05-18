@@ -1,6 +1,7 @@
-package ru.invest.core.config
+package ru.invest.core.functions
 
 import java.util.UUID
+
 import monix.eval.Task
 
 object PureFunction {

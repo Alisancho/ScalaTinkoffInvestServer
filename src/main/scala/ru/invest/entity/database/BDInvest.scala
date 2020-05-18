@@ -1,4 +1,4 @@
-package ru.invest.service.helpers.database
+package ru.invest.entity.database
 
 trait BDInvest {
   val figi: String

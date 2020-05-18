@@ -4,14 +4,7 @@ import java.util.logging.Logger
 
 import cats.effect.ExitCode
 import ru.invest.core.config.ConfigObject._
-import ru.invest.service.{
-  BusinessProcessServiceImpl,
-  DataBaseServiceImpl,
-  MonitoringServiceImpl,
-  TelegramActorMess,
-  TelegramServiceImpl,
-  TinkoffRESTServiceImpl
-}
+import ru.invest.service.{BusinessProcessServiceImpl, DataBaseServiceImpl, MonitoringServiceImpl, TelegramActorMess, TelegramServiceImpl, TinkoffRESTServiceImpl}
 
 import scala.language.postfixOps
 import akka.actor.{ActorRef, ActorSystem}
@@ -20,7 +13,7 @@ import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
-import ru.invest.core.config.MyContext
+import ru.invest.core.context.MyContext
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
 

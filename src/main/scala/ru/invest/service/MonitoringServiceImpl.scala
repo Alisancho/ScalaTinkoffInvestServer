@@ -7,11 +7,11 @@ import com.typesafe.scalalogging.LazyLogging
 import monix.catnap.MVar
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-import ru.invest.service.helpers.database.TaskMonitoringTbl
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.models.market.CandleInterval
 import ru.tinkoff.invest.openapi.models.streaming.{StreamingEvent, StreamingRequest}
 import ru.invest.core.logger.LoggerMessenger._
+import ru.invest.entity.database.TaskMonitoringTbl
 
 import scala.concurrent.Future
 
