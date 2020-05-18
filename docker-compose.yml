@@ -18,3 +18,7 @@ services:
 #      - ./mysql8.0/initdb.d:/docker-entrypoint-initdb.d:ro
 #      - ./common:${MOUNTED_SHARED_DIRECTORY}:ro
 #      - ./auto-generate:/auto-generate:rw
+  web:
+    image: scalainvest
+    ports:
+      - "8080:8080"
