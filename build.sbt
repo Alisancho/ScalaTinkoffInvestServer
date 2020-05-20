@@ -4,6 +4,14 @@ name := "ScalaTinkoffInvestServer"
 version := "0.1"
 
 scalaVersion := "2.13.2"
+enablePlugins(FlywayPlugin)
+
+libraryDependencies += "org.hsqldb" % "hsqldb" % "2.5.0"
+
+flywayUrl := "jdbc:mysql://127.0.0.1:3380/investdb;shutdown=true"
+flywayUser := "root"
+flywayPassword := "joolpass684523rw3eq3e"
+flywayLocations += "db/migration"
 
 lazy val akkaVersion       = "2.6.4"
 lazy val akkaHTTP          = "10.1.11"
@@ -92,3 +100,4 @@ assemblyMergeStrategy in assembly := {
       case _ => MergeStrategy.first
     }
   case _ => MergeStrategy.first}
+
