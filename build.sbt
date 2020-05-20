@@ -4,14 +4,17 @@ name := "ScalaTinkoffInvestServer"
 version := "0.1"
 
 scalaVersion := "2.13.2"
+
 enablePlugins(FlywayPlugin)
 
 libraryDependencies += "org.hsqldb" % "hsqldb" % "2.5.0"
-
-flywayUrl := "jdbc:mysql://127.0.0.1:3380/investdb;shutdown=true"
+//sbt flywayMigrateили очистите ее с помощью sbt flywayClean.
+flywayUrl := "jdbc:mysql://localhost:3380/investdb"
 flywayUser := "root"
 flywayPassword := "joolpass684523rw3eq3e"
 flywayLocations += "db/migration"
+flywayUser in Test := "root"
+flywayPassword in Test := "joolpass684523rw3eq3e"
 
 lazy val akkaVersion       = "2.6.4"
 lazy val akkaHTTP          = "10.1.11"
