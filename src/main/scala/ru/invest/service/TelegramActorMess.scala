@@ -10,8 +10,10 @@ import ru.invest.entity.database.BDInvest
 import ru.mytelegrambot.InvestInfoBot
 
 object TelegramActorMess {
-  val START: String = "/start"
-  val STOP: String  = "/stop"
+  val START: String     = "/start"
+  val STOP: String      = "/stop"
+  val TASK_LIST: String = "/tasks"
+
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
       schedulerDB: SchedulerService): Props =
@@ -43,6 +45,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     case s if s.mess.startsWith(STOP) =>
       taskForFigi(s.copy(s.mess.replace(s"$STOP ", "")))(monitoringServiceImpl.startMonitoring,
                                                          LoggerMessenger.TELEGRAM_RESPONSE_STOP).runAsyncAndForget(schedulerDB)
+   // case s if s.mess.startsWith(STOP) =>
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
