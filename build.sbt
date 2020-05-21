@@ -74,6 +74,9 @@ libraryDependencies += "org.telegram" % "telegrambots" % "4.7"
 
 libraryDependencies += "org.jetbrains" % "annotations" % "19.0.0"
 
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.1.2"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test"
+
 lazy val commonSettings = Seq(
   test in assembly := {}
 )

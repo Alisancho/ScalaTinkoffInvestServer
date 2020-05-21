@@ -20,6 +20,7 @@ public class InvestInfoBot extends TelegramLongPollingBot {
     private final String name;
     private final Long chat_id;
     private final ActorRef acctorRef;
+
     Function2<String, String, Either<Throwable, String>> fun = (chat_id, mess) -> {
         try {
             execute(new SendMessage(chat_id, mess));
