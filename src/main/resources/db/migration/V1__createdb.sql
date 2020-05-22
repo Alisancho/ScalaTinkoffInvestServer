@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `investdb`.`tinkoff_tools_tbl`;
-DROP TABLE IF EXISTS `investdb`.`task_monitoring_tbl`;
+DROP SCHEMA IF EXISTS `investdb`;
+CREATE SCHEMA `investdb` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
 
 CREATE TABLE `investdb`.`tinkoff_tools_tbl`
 (
