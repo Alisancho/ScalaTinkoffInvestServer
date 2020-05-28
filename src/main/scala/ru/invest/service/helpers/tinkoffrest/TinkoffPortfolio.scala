@@ -13,5 +13,4 @@ trait TinkoffPortfolio extends Tinkoff {
   def getPortfolioCurrencies: Task[PortfolioCurrencies] = Task.fromFuture {
     toScala(api.getPortfolioContext.getPortfolioCurrencies(accountId))
   }
-
 }
