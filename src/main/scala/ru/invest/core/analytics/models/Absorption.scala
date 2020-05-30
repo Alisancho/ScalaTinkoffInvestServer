@@ -17,14 +17,13 @@ object Absorption extends LazyLogging {
   def anal(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
       k   <- Task { l.candles.asScala.toList }
-      _   = logger.info(k.toString())
       one = k.filter(r => r.time.getDayOfMonth == OffsetDateTime.now().minusDays(2).getDayOfMonth).head
       two = k.filter(r => r.time.getDayOfMonth == OffsetDateTime.now().minusDays(1).getDayOfMonth).head
-      _   = if (up(one, two)) f(l.toAnalyticsTbl("ABSORPTION", "UP")).runAsyncAndForget(schedulerDB)
-      _   = if (down(one, two)) f(l.toAnalyticsTbl("ABSORPTION", "DOWN")).runAsyncAndForget(schedulerDB)
+      _   = if (trendUp(one, two)) f(l.toAnalyticsTbl("ABSORPTION", "UP")).runAsyncAndForget(schedulerDB)
+      _   = if (trendDown(one, two)) f(l.toAnalyticsTbl("ABSORPTION", "DOWN")).runAsyncAndForget(schedulerDB)
     } yield ()
 
-  private val up: (Candle, Candle) => Boolean = (one, two) => {
+  private val trendUp: (Candle, Candle) => Boolean = (one, two) => {
     if (one.highestPrice.doubleValue() < two.closePrice
           .doubleValue() && one.lowestPrice.doubleValue > two.openPrice.doubleValue) {
       true
@@ -33,7 +32,7 @@ object Absorption extends LazyLogging {
     }
   }
 
-  private val down: (Candle, Candle) => Boolean = (one, two) => {
+  private val trendDown: (Candle, Candle) => Boolean = (one, two) => {
     if (one.highestPrice.doubleValue() < two.openPrice
           .doubleValue() && one.lowestPrice.doubleValue > two.closePrice.doubleValue) {
       true
