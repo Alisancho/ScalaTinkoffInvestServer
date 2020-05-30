@@ -13,4 +13,10 @@ object PureFunction {
       .replace("-", "")
       .substring(23)
   }
+
+  def getUUIDString: String = "3-" + UUID.randomUUID()
+      .toString
+      .replace("-", "")
+      .substring(23)
+
 }

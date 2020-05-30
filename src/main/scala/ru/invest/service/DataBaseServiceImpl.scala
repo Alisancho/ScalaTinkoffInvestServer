@@ -3,7 +3,7 @@ package ru.invest.service
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import ru.invest.core.context.MyContext
-import ru.invest.entity.database.{TaskMonitoringTbl, TinkoffToolsTbl}
+import ru.invest.entity.database.{AnalyticsTbl, TaskMonitoringTbl, TinkoffToolsTbl}
 
 class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
   import ctx._
@@ -91,5 +91,23 @@ class DataBaseServiceImpl(implicit val ctx: MyContext) extends LazyLogging {
         }
       }
   }
+  def insertAnalyticsTblTbl(taskMonitoring: AnalyticsTbl): Task[Long] =
+    ctx
+      .run(
+        query[AnalyticsTbl]
+          .insert(
+            _.idanalytics   -> lift(taskMonitoring.idanalytics),
+            _.typeAnalytics -> lift(taskMonitoring.typeAnalytics),
+            _.figi          -> lift(taskMonitoring.figi),
+            _.datatask      -> lift(taskMonitoring.datatask),
+            _.trend         -> lift(taskMonitoring.trend)
+          )
+          .onConflictUpdate(
+            (t, e) => t.typeAnalytics -> e.typeAnalytics,
+            (t, e) => t.figi          -> e.figi,
+            (t, e) => t.datatask      -> e.datatask,
+            (t, e) => t.trend         -> e.trend
+          )
+      )
 
 }
