@@ -23,7 +23,7 @@ object Hammer {
       q3 = k(k.size - 3)
       q2 = k(k.size - 2)
       q1 = k.last
-      _  = if (trendUp(q1, q2, q3, q4)) f(l.toAnalyticsTbl("HUMMER", "UP")).runAsyncAndForget(schedulerDB)
+      _  = if (trendUp(q1, q2, q3, q4) && q2.isHammerUp) f(l.toAnalyticsTbl("HUMMER", "UP")).runAsyncAndForget(schedulerDB)
 //      _  = if (trendDown(q1, q2, q3, q4)) f(l.toAnalyticsTbl("HUMMER", "DOWN")).runAsyncAndForget(schedulerDB)
     } yield ()
 
