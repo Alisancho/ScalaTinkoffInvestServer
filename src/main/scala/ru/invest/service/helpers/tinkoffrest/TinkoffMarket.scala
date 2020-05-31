@@ -44,7 +44,7 @@ trait TinkoffMarket extends Tinkoff {
       api.getMarketContext
         .getMarketCandles(
           figi,
-          OffsetDateTime.now().minusDays(3),
+          OffsetDateTime.now().minusDays(10),
           OffsetDateTime.now().minusDays(1),
           CandleInterval.DAY))
   }
