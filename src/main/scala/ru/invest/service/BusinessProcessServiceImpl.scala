@@ -1,9 +1,9 @@
 package ru.invest.service
 import akka.stream.Materializer
+import akka.stream.scaladsl.Source
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-import ru.invest.entity.database.TaskMonitoringTbl
 
 class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
                                  dataBaseServiceImpl: DataBaseServiceImpl,
