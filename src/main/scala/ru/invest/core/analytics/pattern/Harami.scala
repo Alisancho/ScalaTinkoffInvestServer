@@ -4,16 +4,13 @@ import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 import ru.invest.entity.database.AnalyticsTbl
 import ru.tinkoff.invest.openapi.models.market.{Candle, HistoricalCandles}
-import AnalyticsTbl._
-import ru.invest.core.analytics.СandleMod._
 
-trait Hammer {
-
-  def hammer(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
+trait Harami {
+  def harami(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
       k <- Task {
-            l.candles.asScala.toList
-          }
+        l.candles.asScala.toList
+      }
       q4 = k(k.size - 4)
       q3 = k(k.size - 3)
       q2 = k(k.size - 2)
