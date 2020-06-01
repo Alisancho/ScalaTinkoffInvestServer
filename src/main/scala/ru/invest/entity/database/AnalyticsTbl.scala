@@ -12,6 +12,4 @@ object AnalyticsTbl {
     def toAnalyticsTbl(analyticTupe: String, trend: String): AnalyticsTbl =
       AnalyticsTbl(PureFunction.getUUIDString, analyticTupe, l.figi, Instant.now(), trend)
   }
-
-
 }
