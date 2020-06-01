@@ -30,7 +30,7 @@ object СandleMod {
         .doubleValue() && q2.lowestPrice.doubleValue > candle.closePrice.doubleValue
 
     def isHammer: Boolean =
-      middleWidth > middleShadow && bodyWidth * 3 < bodyShadow
+      candle.openPrice.doubleValue().min(candle.closePrice.doubleValue()) > middleShadow && bodyWidth * 3 < bodyShadow
 
   }
 
