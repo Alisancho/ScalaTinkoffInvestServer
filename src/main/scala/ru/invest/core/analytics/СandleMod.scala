@@ -7,15 +7,15 @@ object СandleMod {
   implicit class СandleModType(candle: Candle) {
     def bodyWidth: Double = (candle.closePrice.doubleValue() - candle.openPrice.doubleValue()).abs
 
-    def bodyShadow: Double = (candle.lowestPrice.doubleValue() - candle.highestPrice.doubleValue()).abs
+    def shadowWidth: Double = (candle.lowestPrice.doubleValue() - candle.highestPrice.doubleValue()).abs
 
-    def middleWidth: Double = {
+    def bodyMiddle: Double = {
       val step = (candle.closePrice.doubleValue() - candle.openPrice.doubleValue()).abs / 2
       val min  = candle.closePrice.doubleValue().min(candle.openPrice.doubleValue())
       min + step
     }
 
-    def middleShadow: Double = {
+    def shadowMiddle: Double = {
       val step = (candle.lowestPrice.doubleValue() - candle.highestPrice.doubleValue()).abs / 2
       val min  = candle.lowestPrice.doubleValue().min(candle.highestPrice.doubleValue())
       min + step
@@ -30,8 +30,10 @@ object СandleMod {
         .doubleValue() && q2.lowestPrice.doubleValue > candle.closePrice.doubleValue
 
     def isHammer: Boolean =
-      candle.openPrice.doubleValue().min(candle.closePrice.doubleValue()) > middleShadow && bodyWidth * 3 < bodyShadow
+      candle.openPrice.doubleValue().min(candle.closePrice.doubleValue()) > shadowMiddle && bodyWidth * 3 < shadowWidth
 
+    def isRed: Boolean = candle.openPrice.doubleValue() > candle.closePrice.doubleValue()
+    def isGreen: Boolean =candle.openPrice.doubleValue() < candle.closePrice.doubleValue()
   }
 
 }

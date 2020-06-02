@@ -23,9 +23,9 @@ trait Hammer {
     } yield ()
 
   private val trendUp: (Candle, Candle, Candle, Candle) => Boolean = (q1, q2, q3, q4) =>
-    q4.middleWidth > q3.middleWidth && q3.middleWidth > q2.middleWidth && q2.middleWidth < q1.middleWidth
+    q4.bodyMiddle > q3.bodyMiddle && q3.bodyMiddle > q2.bodyMiddle && q2.bodyMiddle < q1.bodyMiddle
 
   private val trendDown: (Candle, Candle, Candle, Candle) => Boolean = (q1, q2, q3, q4) =>
-    q4.middleWidth < q3.middleWidth && q3.middleWidth < q2.middleWidth && q2.middleWidth > q1.middleWidth
+    q4.bodyMiddle < q3.bodyMiddle && q3.bodyMiddle < q2.bodyMiddle && q2.bodyMiddle > q1.bodyMiddle
 
 }
