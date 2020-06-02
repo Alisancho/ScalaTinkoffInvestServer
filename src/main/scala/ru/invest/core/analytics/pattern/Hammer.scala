@@ -8,24 +8,16 @@ import AnalyticsTbl._
 import ru.invest.core.analytics.СandleMod._
 
 trait Hammer {
-
   def hammer(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
-      k <- Task {
-            l.candles.asScala.toList
-          }
+      k <- Task {l.candles.asScala.toList}
       q4 = k(k.size - 4)
       q3 = k(k.size - 3)
       q2 = k(k.size - 2)
       q1 = k.last
-      _  = if (trendUp(q1, q2, q3, q4) && q2.isHammer) f(l.toAnalyticsTbl("HUMMER", "UP")).runAsyncAndForget(schedulerDB)
-      _  = if (trendDown(q1, q2, q3, q4) && q2.isHammer) f(l.toAnalyticsTbl("HUMMER", "DOWN")).runAsyncAndForget(schedulerDB)
+      _  = if ((q2, q1).trendUp && (q4, q3, q2).trendDown && q2.isHammer)
+        f(l.toAnalyticsTbl("HUMMER", "UP")).runAsyncAndForget(schedulerDB)
+      _  = if ((q2, q1).trendDown && (q4, q3, q2).trendUp && q2.isHammer)
+        f(l.toAnalyticsTbl("HUMMER", "DOWN")).runAsyncAndForget(schedulerDB)
     } yield ()
-
-  private val trendUp: (Candle, Candle, Candle, Candle) => Boolean = (q1, q2, q3, q4) =>
-    q4.bodyMiddle > q3.bodyMiddle && q3.bodyMiddle > q2.bodyMiddle && q2.bodyMiddle < q1.bodyMiddle
-
-  private val trendDown: (Candle, Candle, Candle, Candle) => Boolean = (q1, q2, q3, q4) =>
-    q4.bodyMiddle < q3.bodyMiddle && q3.bodyMiddle < q2.bodyMiddle && q2.bodyMiddle > q1.bodyMiddle
-
 }

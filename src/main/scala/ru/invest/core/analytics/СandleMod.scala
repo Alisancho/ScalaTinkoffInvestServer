@@ -32,8 +32,25 @@ object СandleMod {
     def isHammer: Boolean =
       candle.openPrice.doubleValue().min(candle.closePrice.doubleValue()) > shadowMiddle && bodyWidth * 3 < shadowWidth
 
-    def isRed: Boolean = candle.openPrice.doubleValue() > candle.closePrice.doubleValue()
-    def isGreen: Boolean =candle.openPrice.doubleValue() < candle.closePrice.doubleValue()
+    def isRed: Boolean   = candle.openPrice.doubleValue() > candle.closePrice.doubleValue()
+    def isGreen: Boolean = candle.openPrice.doubleValue() < candle.closePrice.doubleValue()
   }
 
+  implicit class ClassTrend3(tuple3: (Candle, Candle, Candle)) {
+    def trendDown: Boolean =
+      tuple3._1.bodyMiddle > tuple3._2.bodyMiddle &&
+        tuple3._2.bodyMiddle > tuple3._3.bodyMiddle
+
+    def trendUp: Boolean =
+      tuple3._1.bodyMiddle < tuple3._2.bodyMiddle &&
+        tuple3._2.bodyMiddle < tuple3._3.bodyMiddle
+  }
+
+  implicit class ClassTrend2(tuple3: (Candle, Candle)) {
+    def trendDown: Boolean =
+      tuple3._1.bodyMiddle > tuple3._2.bodyMiddle
+
+    def trendUp: Boolean =
+      tuple3._1.bodyMiddle < tuple3._2.bodyMiddle
+  }
 }
