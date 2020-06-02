@@ -17,6 +17,6 @@ object analysis extends Hammer with Absorption with Harami{
   }
 
   implicit class ConverterHarami(k: HistoricalCandles) {
-    def toHammer(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] = harami(k)(f)(schedulerDB)
+    def toHarami(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] = harami(k)(f)(schedulerDB)
   }
 }
