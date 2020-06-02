@@ -17,16 +17,24 @@ trait Harami {
       q3 = k(k.size - 3)
       q2 = k(k.size - 2)
       q1 = k.last
-      _  = if (trendUp(q1, q2, q3, q4, q5) && q2.isGreen && q3.isRed) f(l.toAnalyticsTbl("HARAMI", "UP")).runAsyncAndForget(schedulerDB)
-//      _  = if (trendDown(q1, q2, q3, q4) && q2.isHammer) f(l.toAnalyticsTbl("HUMMER", "DOWN")).runAsyncAndForget(schedulerDB)
+      _  = if ((q3, q4, q5).trendDown && (q2,q1).trendUp && harami2Up(q2,q3))
+        f(l.toAnalyticsTbl("HARAMI", "UP")).runAsyncAndForget(schedulerDB)
+      _  = if ((q3, q4, q5).trendUp && (q2,q1).trendDown && harami2Down(q2,q3))
+        f(l.toAnalyticsTbl("HARAMI", "DOWN")).runAsyncAndForget(schedulerDB)
     } yield ()
 
-  private val trendUp: (Candle, Candle, Candle,Candle,Candle) => Boolean = (q1, q2, q3, q4,q5) =>
-    q5.bodyMiddle > q4.bodyMiddle && q4.bodyMiddle > q3.bodyMiddle && q2.bodyMiddle < q1.bodyMiddle
+  private val harami2Up:(Candle, Candle) => Boolean = (q1,q2) =>
+      q1.isGreen && q2.isRed &&
+      q2.openPrice.doubleValue() > q1.closePrice.doubleValue() &&
+      q2.openPrice.doubleValue() > q1.openPrice.doubleValue() &&
+      q2.closePrice.doubleValue() < q1.openPrice.doubleValue() &&
+      q2.closePrice.doubleValue() < q1.closePrice.doubleValue()
 
-
-  private val trendDown: (Candle, Candle, Candle, Candle) => Boolean = (q1, q2, q3, q4) =>
-    q4.bodyMiddle < q3.bodyMiddle && q3.bodyMiddle < q2.bodyMiddle && q2.bodyMiddle > q1.bodyMiddle
-
+  private val harami2Down:(Candle, Candle) => Boolean = (q1,q2) =>
+    q1.isRed && q2.isGreen &&
+      q2.openPrice.doubleValue() < q1.closePrice.doubleValue() &&
+      q2.openPrice.doubleValue() < q1.openPrice.doubleValue() &&
+      q2.closePrice.doubleValue() > q1.openPrice.doubleValue() &&
+      q2.closePrice.doubleValue() > q1.closePrice.doubleValue()
 
 }

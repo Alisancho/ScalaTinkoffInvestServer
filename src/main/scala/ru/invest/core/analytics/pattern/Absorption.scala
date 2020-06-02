@@ -8,7 +8,6 @@ import AnalyticsTbl._
 import ru.invest.core.analytics.СandleMod._
 
 trait Absorption {
-
   def absorption(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
       k  <- Task { l.candles.asScala.toList }

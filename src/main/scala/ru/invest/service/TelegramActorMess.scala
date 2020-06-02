@@ -13,6 +13,7 @@ object TelegramActorMess {
   val START: String     = "/start"
   val STOP: String      = "/stop"
   val TASK_LIST: String = "/tasks"
+  val ANALYSIS: String = "/analysis"
 
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
