@@ -13,7 +13,9 @@ trait Absorption {
       k  <- Task { l.candles.asScala.toList }
       q2 = k(k.size - 2)
       q1 = k.last
-      _  = if (q1.isAbsorptionUp(q2)) f(l.toAnalyticsTbl("ABSORPTION", "UP")).runAsyncAndForget(schedulerDB)
-      _  = if (q1.isAbsorptionDown(q2)) f(l.toAnalyticsTbl("ABSORPTION", "DOWN")).runAsyncAndForget(schedulerDB)
+      _  = if (q1.isAbsorptionUp(q2))
+        f(l.toAnalyticsTbl("ABSORPTION", "UP")).runAsyncAndForget(schedulerDB)
+      _  = if (q1.isAbsorptionDown(q2))
+        f(l.toAnalyticsTbl("ABSORPTION", "DOWN")).runAsyncAndForget(schedulerDB)
     } yield ()
 }
