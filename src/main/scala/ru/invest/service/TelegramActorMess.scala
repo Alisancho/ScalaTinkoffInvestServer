@@ -9,13 +9,9 @@ import ru.invest.core.functions.PureFunction
 import ru.invest.core.logger.LoggerMessenger
 import ru.invest.entity.database.BDInvest
 import ru.mytelegrambot.InvestInfoBot
-
+import ru.invest.core.config.ConfigObject._
 object TelegramActorMess {
-  val START: String           = "/start"
-  val STOP: String            = "/stop"
-  val TASK_LIST: String       = "/tasks"
-  val ANALYTICS_START: String = "ANALYTICS_START"
-  val ANALYTICS_STOP: String  = "ANALYTICS_STOP"
+
 
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
@@ -68,6 +64,13 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
       } else {
         s.investInfoBot.sendMessage("Сбор аналитики не запущен")
       }
+
+    case s if s.mess.startsWith(UPDATE_TOOLS) => {
+      businessProcessServiceImpl.ubdateTinkoffToolsTable.runAsyncAndForget(schedulerDB)
+      s.investInfoBot.sendMessage("Запущено обновление таблицы")
+    }
+
+
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 

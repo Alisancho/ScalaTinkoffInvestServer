@@ -17,12 +17,9 @@ import ru.invest.controllers.TaskController
 import ru.invest.core.context.MyContext
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
-import ru.invest.core.analytics.analysis._
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
-
-import akka.util.ccompat.JavaConverters._
 
 object AppStart extends TaskApp with AppStartHelper {
 
