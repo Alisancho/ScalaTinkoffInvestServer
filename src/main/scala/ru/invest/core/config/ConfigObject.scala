@@ -20,4 +20,11 @@ object ConfigObject {
   val TELEGRAM_PROXY: Boolean  = conf.getBoolean("telegtam.proxy")
   val TELEGRAM_PORT: Int       = conf.getInt("telegtam.port")
   val TELEGRAM_CHAT_ID: Int    = conf.getInt("telegtam.chat.id")
+
+  val START: String           = "/start"
+  val STOP: String            = "/stop"
+  val TASK_LIST: String       = "/tasks"
+  val ANALYTICS_START: String = "Сбор аналитики"
+  val ANALYTICS_STOP: String  = "Остановка сбора аналитики"
+  val UPDATE_TOOLS:String = "Обновить базу с активами"
 }

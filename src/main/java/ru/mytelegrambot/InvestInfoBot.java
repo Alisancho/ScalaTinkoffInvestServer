@@ -12,11 +12,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import ru.invest.core.config.ConfigObject;
 import ru.invest.service.TelegramContainerMess;
-import scala.Function2;
-import scala.util.Either;
-import scala.util.Left;
-import scala.util.Right;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +45,18 @@ public class InvestInfoBot extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(new KeyboardButton("ANALYTICS_START"));
-        KeyboardRow keyboardSecondRow = new KeyboardRow();
-        keyboardSecondRow.add(new KeyboardButton("ANALYTICS_STOP"));
-        keyboard.add(keyboardFirstRow);
-        keyboard.add(keyboardSecondRow);
+        KeyboardRow keyboardFirstRow1 = new KeyboardRow();
+        keyboardFirstRow1.add(new KeyboardButton(ConfigObject.ANALYTICS_START()));
+
+        KeyboardRow keyboardFirstRow2 = new KeyboardRow();
+        keyboardFirstRow2.add(new KeyboardButton(ConfigObject.ANALYTICS_STOP()));
+
+        KeyboardRow keyboardFirstRow3 = new KeyboardRow();
+        keyboardFirstRow3.add(new KeyboardButton(ConfigObject.UPDATE_TOOLS()));
+
+        keyboard.add(keyboardFirstRow1);
+        keyboard.add(keyboardFirstRow2);
+        keyboard.add(keyboardFirstRow3);
         replyKeyboardMarkup.setKeyboard(keyboard);
         sendMessage("START_SERVER");
     }
