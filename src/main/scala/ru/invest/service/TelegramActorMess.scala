@@ -13,7 +13,7 @@ object TelegramActorMess {
   val START: String     = "/start"
   val STOP: String      = "/stop"
   val TASK_LIST: String = "/tasks"
-  val ANALYSIS: String = "/analysis"
+  val ANALYSIS: String  = "ANALYTICS"
 
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
@@ -29,6 +29,8 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     extends Actor {
   import TelegramActorMess._
   val log: LoggingAdapter = Logging(context.system, this)
+
+  var analysisFlag = false
 
   def receive: Receive = {
     case mes: TelegramContainerMess => {
@@ -46,7 +48,12 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     case s if s.mess.startsWith(STOP) =>
       taskForFigi(s.copy(s.mess.replace(s"$STOP ", "")))(monitoringServiceImpl.startMonitoring,
                                                          LoggerMessenger.TELEGRAM_RESPONSE_STOP).runAsyncAndForget(schedulerDB)
-   // case s if s.mess.startsWith(STOP) =>
+    case s if s.mess.startsWith(ANALYSIS) =>
+      if (analysisFlag) {
+        s.investInfoBot.sendMessage("Сбор аналитики уже запущен")
+      } else {
+        analysisFlag = true
+      }
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
 
