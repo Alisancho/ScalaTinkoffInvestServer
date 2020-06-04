@@ -4,7 +4,7 @@ import java.util.logging.Logger
 
 import cats.effect.ExitCode
 import ru.invest.core.config.ConfigObject._
-import ru.invest.service.{BusinessProcessServiceImpl, DataBaseServiceImpl, MonitoringServiceImpl, TelegramActorMess, TelegramServiceImpl, TinkoffRESTServiceImpl}
+import ru.invest.service._
 
 import scala.language.postfixOps
 import akka.actor.{ActorRef, ActorSystem}
@@ -13,12 +13,16 @@ import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
+import ru.invest.controllers.TaskController
 import ru.invest.core.context.MyContext
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
+import ru.invest.core.analytics.analysis._
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
+
+import akka.util.ccompat.JavaConverters._
 
 object AppStart extends TaskApp with AppStartHelper {
 
@@ -31,12 +35,14 @@ object AppStart extends TaskApp with AppStartHelper {
       ta  = system.actorOf(TelegramActorMess(ms, dbs)(schedulerTinkoff, schedulerDB))
       tel <- startTelegramService(ta)
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms, tel)(schedulerDB, schedulerTinkoff, materialiver) }
-//      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
-//      _   <- Task.fromFuture { Http().bindAndHandle(tc.routApiV1, SERVER_HOST, SERVER_PORT) }
-      _ <- bu.ubdateTinkoffToolsTable
-      _ <- bu.updateTaskMonitoringTbl
-      _ = bu.startAllTaskMonitoring.runAsyncAndForget(schedulerDB)
+      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
+      c   <- ts.getMarketStocks
+      _ = ta ! bu
+//      _ <- bu.ubdateTinkoffToolsTable
+//      _ <- bu.updateTaskMonitoringTbl
+//      _ = bu.startAllTaskMonitoring.runAsyncAndForget(schedulerDB)
     } yield ExitCode.Success
+
 }
 
 trait AppStartHelper extends LazyLogging {
