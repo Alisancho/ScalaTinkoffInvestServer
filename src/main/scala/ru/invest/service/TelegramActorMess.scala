@@ -61,6 +61,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
       if (analysisFlag) {
         sharedKillSwitch.shutdown()
         analysisFlag = false
+        s.investInfoBot.sendMessage("Успешный запуск сбора аналитики")
       } else {
         s.investInfoBot.sendMessage("Сбор аналитики не запущен")
       }
