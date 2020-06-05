@@ -20,11 +20,11 @@ class MonitoringServiceImpl(api: OpenApi)(schedulerDB: SchedulerService)(implici
     extends LazyLogging {
   val sharedKillSwitch: SharedKillSwitch = KillSwitches.shared("my-kill-switch")
 
-  def startMonitoring(figi: String): Task[Unit] = Task {
+  def startMonitoring(figi: String): Task[_] = Task {
     api.getStreamingContext.sendRequest(StreamingRequest.subscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
-  def stopMonitoring(figi: String): Task[Unit] = Task {
+  def stopMonitoring(figi: String): Task[_] = Task {
     api.getStreamingContext.sendRequest(StreamingRequest.unsubscribeCandle(figi, CandleInterval.FIVE_MIN))
   }
 
