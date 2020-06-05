@@ -6,17 +6,12 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.invest.core.config.ConfigObject;
 import ru.invest.service.TelegramContainerMess;
 
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,26 +33,21 @@ public class InvestInfoBot extends TelegramLongPollingBot {
         this.chat_id = chat_id;
         this.acctorRef = acctorRef;
 
-        this.replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setSelective(true);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(false);
+        this.replyKeyboardMarkup = new ReplyKeyboardMarkup()
+                .setSelective(true)
+                .setResizeKeyboard(true)
+                .setOneTimeKeyboard(false);
 
-        List<KeyboardRow> keyboard = new ArrayList<>();
+        final var keyboardFirstRow1 = new KeyboardRow();
+        final var keyboardFirstRow2 = new KeyboardRow();
+        final var keyboardFirstRow3 = new KeyboardRow();
 
-        KeyboardRow keyboardFirstRow1 = new KeyboardRow();
+        keyboardFirstRow3.add(new KeyboardButton(ConfigObject.UPDATE_TOOLS()));
+        keyboardFirstRow2.add(new KeyboardButton(ConfigObject.ANALYTICS_STOP()));
         keyboardFirstRow1.add(new KeyboardButton(ConfigObject.ANALYTICS_START()));
 
-        KeyboardRow keyboardFirstRow2 = new KeyboardRow();
-        keyboardFirstRow2.add(new KeyboardButton(ConfigObject.ANALYTICS_STOP()));
+        replyKeyboardMarkup.setKeyboard(List.of(keyboardFirstRow1, keyboardFirstRow2, keyboardFirstRow3));
 
-        KeyboardRow keyboardFirstRow3 = new KeyboardRow();
-        keyboardFirstRow3.add(new KeyboardButton(ConfigObject.UPDATE_TOOLS()));
-
-        keyboard.add(keyboardFirstRow1);
-        keyboard.add(keyboardFirstRow2);
-        keyboard.add(keyboardFirstRow3);
-        replyKeyboardMarkup.setKeyboard(keyboard);
         sendMessage("START_SERVER");
     }
 
@@ -93,7 +83,7 @@ public class InvestInfoBot extends TelegramLongPollingBot {
     }
 
     public void sendMessage(String mess) {
-        SendMessage sendMessage =  new SendMessage(chat_id, mess);
+        var sendMessage = new SendMessage(chat_id, mess);
         sendMessage.setReplyMarkup(this.replyKeyboardMarkup);
         try {
             execute(sendMessage);

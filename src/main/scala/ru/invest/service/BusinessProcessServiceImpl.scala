@@ -72,9 +72,9 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
             case Right(value) => {
               val list = value.get()
               logger.info(list.toString)
-              list.toAbsorption(dbs.insertAnalyticsTblTbl)(sheduler).runAsyncAndForget(sheduler)
-              list.toHammer(dbs.insertAnalyticsTblTbl)(sheduler).runAsyncAndForget(sheduler)
-              list.toHarami(dbs.insertAnalyticsTblTbl)(sheduler).runAsyncAndForget(sheduler)
+              list.toAbsorption(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
+              list.toHammer(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
+              list.toHarami(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
             }
           }(sheduler)
       })

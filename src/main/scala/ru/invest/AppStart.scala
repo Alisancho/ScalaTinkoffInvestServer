@@ -35,11 +35,7 @@ object AppStart extends TaskApp with AppStartHelper {
       tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
       c   <- ts.getMarketStocks
       _ = ta ! bu
-//      _ <- bu.ubdateTinkoffToolsTable
-//      _ <- bu.updateTaskMonitoringTbl
-//      _ = bu.startAllTaskMonitoring.runAsyncAndForget(schedulerDB)
     } yield ExitCode.Success
-
 }
 
 trait AppStartHelper extends LazyLogging {
