@@ -12,7 +12,6 @@ import ru.mytelegrambot.InvestInfoBot
 import ru.invest.core.config.ConfigObject._
 object TelegramActorMess {
 
-
   def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
       schedulerTinkoff: SchedulerService,
       schedulerDB: SchedulerService): Props =
@@ -25,7 +24,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
     schedulerTinkoff: SchedulerService,
     schedulerDB: SchedulerService)
     extends Actor {
-  import TelegramActorMess._
+
   val log: LoggingAdapter = Logging(context.system, this)
 
   var analysisFlag                                           = false
@@ -57,7 +56,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
         sharedKillSwitch = KillSwitches.shared("my-kill-switch")
         businessProcessServiceImpl.startAnalyticsJob(sharedKillSwitch).runAsyncAndForget(schedulerDB)
       }
-    case s if s.mess.startsWith(ANALYTICS_STOP) =>
+    case s if s.mess == ANALYTICS_STOP =>
       if (analysisFlag) {
         sharedKillSwitch.shutdown()
         analysisFlag = false
@@ -66,11 +65,10 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
         s.investInfoBot.sendMessage("Сбор аналитики не запущен")
       }
 
-    case s if s.mess.startsWith(UPDATE_TOOLS) => {
+    case s if s.mess == UPDATE_TOOLS => {
       businessProcessServiceImpl.ubdateTinkoffToolsTable.runAsyncAndForget(schedulerDB)
       s.investInfoBot.sendMessage("Запущено обновление таблицы")
     }
-
 
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }

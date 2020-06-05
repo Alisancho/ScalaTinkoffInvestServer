@@ -1,7 +1,6 @@
 package ru.invest.service
-import akka.{Done, NotUsed}
-import akka.actor.ActorRef
-import akka.stream.{ActorMaterializer, Materializer, SharedKillSwitch, ThrottleMode}
+import akka.NotUsed
+import akka.stream.{Materializer, SharedKillSwitch, ThrottleMode}
 import akka.stream.scaladsl.{RunnableGraph, Sink, Source}
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.Task
