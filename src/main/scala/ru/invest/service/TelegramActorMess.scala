@@ -55,12 +55,13 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
         analysisFlag = true
         sharedKillSwitch = KillSwitches.shared("my-kill-switch")
         businessProcessServiceImpl.startAnalyticsJob(sharedKillSwitch).runAsyncAndForget(schedulerDB)
+        s.investInfoBot.sendMessage("Успешный запуск сбора аналитики")
       }
     case s if s.mess == ANALYTICS_STOP =>
       if (analysisFlag) {
         sharedKillSwitch.shutdown()
         analysisFlag = false
-        s.investInfoBot.sendMessage("Успешный запуск сбора аналитики")
+        s.investInfoBot.sendMessage("Сбор аналитики остановлен")
       } else {
         s.investInfoBot.sendMessage("Сбор аналитики не запущен")
       }
