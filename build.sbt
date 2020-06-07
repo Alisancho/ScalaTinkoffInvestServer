@@ -16,7 +16,7 @@ flywayLocations += "db/migration"
 flywayUser in Test := "root"
 flywayPassword in Test := "joolpass684523rw3eq3e"
 
-lazy val akkaVersion       = "2.6.4"
+lazy val akkaVersion       = "2.6.5"
 lazy val logBackVersion    = "1.2.3"
 lazy val catsVersion       = "2.0.0"
 lazy val catsEffectVersion = "2.0.0"
@@ -28,6 +28,8 @@ lazy val tinkoffapi        = "0.4.1"
 libraryDependencies ++= Seq(
   "com.typesafe.akka"    %% "akka-actor"              % akkaVersion,
   "com.typesafe.akka"    %% "akka-testkit"            % akkaVersion % Test,
+  "com.typesafe.akka"    %% "akka-http"               % "10.1.12",
+  "com.typesafe.akka"    %% "akka-http-testkit"       % "10.1.12" % Test,
   "com.typesafe.akka"    %% "akka-stream"             % akkaVersion,
   "com.typesafe.akka"    %% "akka-stream-testkit"     % akkaVersion % Test,
   "com.typesafe.akka"    %% "akka-persistence"        % akkaVersion,

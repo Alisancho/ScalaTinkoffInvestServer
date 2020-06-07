@@ -8,11 +8,14 @@ import ru.invest.service._
 
 import scala.language.postfixOps
 import akka.actor.{ActorRef, ActorSystem}
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Route
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
+import ru.invest.controllers.TaskController
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
 
@@ -23,13 +26,14 @@ object AppStart extends TaskApp with AppStartHelper {
 
   override def run(args: List[String]): Task[ExitCode] =
     for {
-      api <- apiTask
-      ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
-      ta  = system.actorOf(TelegramActorMess(schedulerTinkoff))
-      tel <- startTelegramService(ta)
-      bu  <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
-      c   <- ts.getMarketStocks
-      _   = ta ! bu
+      api      <- apiTask
+      ts       <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
+      ta       = system.actorOf(TelegramActorMess(schedulerTinkoff))
+      tel      <- startTelegramService(ta)
+      bu       <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
+      _        = ta ! bu
+//      tc  <- Task { new TaskController() }
+//      _   <- Task.fromFuture { Http().bindAndHandle(Route.handlerFlow(tc.routApiV1()),SERVER_HOST,SERVER_PORT) }
     } yield ExitCode.Success
 }
 
