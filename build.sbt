@@ -17,7 +17,6 @@ flywayUser in Test := "root"
 flywayPassword in Test := "joolpass684523rw3eq3e"
 
 lazy val akkaVersion       = "2.6.4"
-lazy val akkaHTTP          = "10.1.11"
 lazy val logBackVersion    = "1.2.3"
 lazy val catsVersion       = "2.0.0"
 lazy val catsEffectVersion = "2.0.0"
@@ -31,8 +30,6 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka"    %% "akka-testkit"            % akkaVersion % Test,
   "com.typesafe.akka"    %% "akka-stream"             % akkaVersion,
   "com.typesafe.akka"    %% "akka-stream-testkit"     % akkaVersion % Test,
-  "com.typesafe.akka"    %% "akka-http"               % akkaHTTP,
-  "com.typesafe.akka"    %% "akka-http-testkit"       % akkaHTTP % Test,
   "com.typesafe.akka"    %% "akka-persistence"        % akkaVersion,
   "com.typesafe.akka"    %% "akka-distributed-data"   % akkaVersion,
   "com.typesafe.akka"    %% "akka-slf4j"              % akkaVersion,
@@ -60,22 +57,17 @@ libraryDependencies ++= Seq(
   "co.fs2"        %% "fs2-core"    % fs2Version,
   "co.fs2"        %% "fs2-io"      % fs2Version
 )
-
-libraryDependencies ++= Seq(
-  "io.getquill" %% "quill-jdbc-monix" % quillVersion,
-  "io.getquill" %% "quill-core"       % quillVersion,
-  "io.getquill" %% "quill-sql"        % quillVersion,
-  "mysql" % "mysql-connector-java"    % "8.0.18"
-)
+// https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
 
 libraryDependencies += "io.projectreactor" % "reactor-core" % "3.3.5.RELEASE"
 
 libraryDependencies += "org.telegram" % "telegrambots" % "4.7"
 
 libraryDependencies += "org.jetbrains" % "annotations" % "19.0.0"
+// https://mvnrepository.com/artifact/io.monix/monix
+libraryDependencies += "io.monix" %% "monix" % "3.2.2"
 
-libraryDependencies += "org.scalactic" %% "scalactic" % "3.1.2"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.2" % "test"
 
 lazy val commonSettings = Seq(
   test in assembly := {}

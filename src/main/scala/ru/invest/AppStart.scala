@@ -13,8 +13,6 @@ import com.typesafe.scalalogging.LazyLogging
 import monix.eval.{Task, TaskApp}
 import monix.execution.Scheduler
 import monix.execution.schedulers.SchedulerService
-import ru.invest.controllers.TaskController
-import ru.invest.core.context.MyContext
 import ru.tinkoff.invest.openapi.OpenApi
 import ru.tinkoff.invest.openapi.okhttp.OkHttpOpenApiFactory
 
@@ -26,15 +24,12 @@ object AppStart extends TaskApp with AppStartHelper {
   override def run(args: List[String]): Task[ExitCode] =
     for {
       api <- apiTask
-      dbs <- Task { new DataBaseServiceImpl }
       ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
-      ms  <- Task { new MonitoringServiceImpl(api)(schedulerDB) }
-      ta  = system.actorOf(TelegramActorMess(ms, dbs)(schedulerTinkoff, schedulerDB))
+      ta  = system.actorOf(TelegramActorMess(schedulerTinkoff))
       tel <- startTelegramService(ta)
-      bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms, tel)(schedulerDB, schedulerTinkoff, materialiver) }
-      tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
+      bu  <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
       c   <- ts.getMarketStocks
-      _ = ta ! bu
+      _   = ta ! bu
     } yield ExitCode.Success
 }
 
@@ -42,8 +37,6 @@ trait AppStartHelper extends LazyLogging {
   implicit val system: ActorSystem          = ActorSystem()
   implicit val ec: ExecutionContextExecutor = system.dispatcher
   implicit val materialiver: Materializer   = ActorMaterializer()
-  implicit val ctx: MyContext               = new MyContext()
-  val schedulerDB: SchedulerService         = Scheduler.fixedPool(name = "my-fixed-db", poolSize = SCHEDULER_POOL_DB)
   implicit val schedulerTinkoff: SchedulerService =
     Scheduler.fixedPool(name = "my-fixed-tinkoff", poolSize = SCHEDULER_POOL_TINKOFF)
 

@@ -40,13 +40,11 @@ public class InvestInfoBot extends TelegramLongPollingBot {
 
         final var keyboardFirstRow1 = new KeyboardRow();
         final var keyboardFirstRow2 = new KeyboardRow();
-        final var keyboardFirstRow3 = new KeyboardRow();
 
-        keyboardFirstRow3.add(new KeyboardButton(ConfigObject.UPDATE_TOOLS()));
         keyboardFirstRow2.add(new KeyboardButton(ConfigObject.ANALYTICS_STOP()));
         keyboardFirstRow1.add(new KeyboardButton(ConfigObject.ANALYTICS_START()));
 
-        replyKeyboardMarkup.setKeyboard(List.of(keyboardFirstRow1, keyboardFirstRow2, keyboardFirstRow3));
+        replyKeyboardMarkup.setKeyboard(List.of(keyboardFirstRow1, keyboardFirstRow2));
 
         sendMessage("START_SERVER");
     }

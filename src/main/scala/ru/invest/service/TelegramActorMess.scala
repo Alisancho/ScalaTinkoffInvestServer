@@ -5,25 +5,17 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.{KillSwitches, SharedKillSwitch}
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
-import ru.invest.core.functions.PureFunction
-import ru.invest.core.logger.LoggerMessenger
-import ru.invest.entity.database.BDInvest
 import ru.mytelegrambot.InvestInfoBot
 import ru.invest.core.config.ConfigObject._
+import ru.invest.entity.database.AnalyticsTbl
 object TelegramActorMess {
 
-  def apply(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
-      schedulerTinkoff: SchedulerService,
-      schedulerDB: SchedulerService): Props =
-    Props(new TelegramActorMess(monitoringServiceImpl, dataBaseServiceImpl)(schedulerTinkoff, schedulerDB))
+  def apply(schedulerTinkoff: SchedulerService): Props = Props(new TelegramActorMess(schedulerTinkoff))
 }
 
 case class TelegramContainerMess(mess: String, investInfoBot: InvestInfoBot)
 
-class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseServiceImpl: DataBaseServiceImpl)(
-    schedulerTinkoff: SchedulerService,
-    schedulerDB: SchedulerService)
-    extends Actor {
+class TelegramActorMess(schedulerTinkoff: SchedulerService) extends Actor {
 
   val log: LoggingAdapter = Logging(context.system, this)
 
@@ -41,20 +33,15 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
   }
 
   private def parsStringd(s: TelegramContainerMess): Unit = s match {
-    case s if s.mess.startsWith(START) =>
-      taskForFigi(s.copy(s.mess.replace(s"$START ", "")))(
-        monitoringServiceImpl.startMonitoring,
-        LoggerMessenger.TELEGRAM_RESPONSE_START).runAsyncAndForget(schedulerDB)
-    case s if s.mess.startsWith(STOP) =>
-      taskForFigi(s.copy(s.mess.replace(s"$STOP ", "")))(monitoringServiceImpl.startMonitoring,
-                                                         LoggerMessenger.TELEGRAM_RESPONSE_STOP).runAsyncAndForget(schedulerDB)
     case s if s.mess.startsWith(ANALYTICS_START) =>
       if (analysisFlag) {
         s.investInfoBot.sendMessage("Сбор аналитики уже запущен")
       } else {
         analysisFlag = true
         sharedKillSwitch = KillSwitches.shared("my-kill-switch")
-        businessProcessServiceImpl.startAnalyticsJob(sharedKillSwitch).runAsyncAndForget(schedulerDB)
+        businessProcessServiceImpl
+          .startAnalyticsJob(sharedKillSwitch)(fun(_, s))
+          .runAsyncAndForget(schedulerTinkoff)
         s.investInfoBot.sendMessage("Успешный запуск сбора аналитики")
       }
     case s if s.mess == ANALYTICS_STOP =>
@@ -66,25 +53,10 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
         s.investInfoBot.sendMessage("Сбор аналитики не запущен")
       }
 
-    case s if s.mess == UPDATE_TOOLS => {
-      businessProcessServiceImpl.ubdateTinkoffToolsTable.runAsyncAndForget(schedulerDB)
-      s.investInfoBot.sendMessage("Запущено обновление таблицы")
-    }
-
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
-
-  private def taskForFigi(s: TelegramContainerMess)(f: String => Task[_], l: (BDInvest, String) => String): Task[_] =
-    (for {
-      taskid <- PureFunction.getUUID
-      p      <- dataBaseServiceImpl.selectTinkoffToolsTbl(s.mess)
-      _      <- f(p.figi)
-      mess   = l(p, taskid)
-      _      = log.info(mess)
-    } yield s.investInfoBot.sendMessage(mess))
-      .onErrorHandle(o => {
-        log.error(o.getMessage)
-        s.investInfoBot.sendMessage(o.getMessage)
-      })
-
+  val fun: (AnalyticsTbl, TelegramContainerMess) => Task[_] = (w, t) =>
+    Task {
+      t.investInfoBot.sendMessage(w.toString)
+  }
 }
