@@ -50,7 +50,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
         .forEach(o => dataBaseServiceImpl.insertTaskMonitoringTbl(o).runAsyncAndForget(schedulerDB: SchedulerService))
     } yield ()
 
-  def startAnalyticsJob(sharedKillSwitch: SharedKillSwitch): Task[Unit] =
+  def startAnalyticsJob(sharedKillSwitch: SharedKillSwitch): Task[_] =
     for {
       c    <- tinkoffRESTServiceImpl.getMarketStocks
       list = c.instruments.asScala.toList.map(_.figi)
@@ -71,9 +71,18 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
             case Right(value) => {
               val list = value.get()
               logger.info(list.toString)
-              list.toAbsorption(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
-              list.toHammer(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
-              list.toHarami(dbs.insertAnalyticsTblTbl)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
+              list
+                .toAbsorption(dbs.insertAnalyticsTblTbl)(sheduler)
+                .onErrorHandle(p => logger.error(p.getMessage))
+                .runAsyncAndForget(sheduler)
+              list
+                .toHammer(dbs.insertAnalyticsTblTbl)(sheduler)
+                .onErrorHandle(p => logger.error(p.getMessage))
+                .runAsyncAndForget(sheduler)
+              list
+                .toHarami(dbs.insertAnalyticsTblTbl)(sheduler)
+                .onErrorHandle(p => logger.error(p.getMessage))
+                .runAsyncAndForget(sheduler)
             }
           }(sheduler)
       })
