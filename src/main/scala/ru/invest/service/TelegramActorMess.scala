@@ -8,6 +8,7 @@ import monix.execution.schedulers.SchedulerService
 import ru.mytelegrambot.InvestInfoBot
 import ru.invest.core.config.ConfigObject._
 import ru.invest.entity.database.AnalyticsTbl
+import ru.tinkoff.invest.openapi.models.market.Instrument
 object TelegramActorMess {
 
   def apply(schedulerTinkoff: SchedulerService): Props = Props(new TelegramActorMess(schedulerTinkoff))
@@ -55,8 +56,8 @@ class TelegramActorMess(schedulerTinkoff: SchedulerService) extends Actor {
 
     case _ => log.info("NEW_MESSEND_FROM_TELEGRAM=" + s)
   }
-  val fun: (AnalyticsTbl, TelegramContainerMess) => Task[_] = (w, t) =>
+  val fun: (String, TelegramContainerMess) => Task[_] = (w, t) =>
     Task {
-      t.investInfoBot.sendMessage(w.toString)
+      t.investInfoBot.sendMessage(w)
   }
 }

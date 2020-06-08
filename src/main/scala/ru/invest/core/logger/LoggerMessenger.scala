@@ -1,6 +1,7 @@
 package ru.invest.core.logger
 
 import ru.invest.entity.database.BDInvest
+import ru.tinkoff.invest.openapi.models.market.Instrument
 import ru.tinkoff.invest.openapi.models.streaming.StreamingEvent
 
 object LoggerMessenger {
@@ -33,5 +34,12 @@ object LoggerMessenger {
       |NAME = ${mess.name}
       |TICKER = ${mess.ticker}
       |TASK_ID = $taskID
+      |""".stripMargin
+
+  val ANALYSIS_ACTIV: Instrument => String =  inst => s"""
+      |Возможен рост актива:
+      |FIGI = ${inst.figi}
+      |NAME = ${inst.name}
+      |TICKER = ${inst.ticker}
       |""".stripMargin
 }

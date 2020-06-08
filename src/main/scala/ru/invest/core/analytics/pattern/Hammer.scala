@@ -3,12 +3,13 @@ import akka.util.ccompat.JavaConverters._
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 import ru.invest.entity.database.AnalyticsTbl
-import ru.tinkoff.invest.openapi.models.market.{Candle, HistoricalCandles}
+import ru.tinkoff.invest.openapi.models.market.{Candle, HistoricalCandles, Instrument}
 import AnalyticsTbl._
 import ru.invest.core.analytics.СandleMod._
+import ru.invest.core.ClassMod._
 
 trait Hammer {
-  def hammer(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
+  def hammer(l: HistoricalCandles)(instrument:Instrument)(f: String => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
       k <- Task {l.candles.asScala.toList}
       q4 = k(k.size - 4)
@@ -16,8 +17,8 @@ trait Hammer {
       q2 = k(k.size - 2)
       q1 = k.last
       _  = if ((q2, q1).trendUp && (q4, q3, q2).trendDown && q2.isHammer)
-        f(l.toAnalyticsTbl("HUMMER", "UP")).runAsyncAndForget(schedulerDB)
+        f(instrument.toStringTelegramUp).runAsyncAndForget(schedulerDB)
       _  = if ((q2, q1).trendDown && (q4, q3, q2).trendUp && q2.isHammer)
-        f(l.toAnalyticsTbl("HUMMER", "DOWN")).runAsyncAndForget(schedulerDB)
+        f(instrument.toStringTelegramDown).runAsyncAndForget(schedulerDB)
     } yield ()
 }

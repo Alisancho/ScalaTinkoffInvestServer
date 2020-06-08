@@ -3,11 +3,12 @@ import akka.util.ccompat.JavaConverters._
 import monix.eval.Task
 import monix.execution.schedulers.SchedulerService
 import ru.invest.entity.database.AnalyticsTbl
-import ru.tinkoff.invest.openapi.models.market.{Candle, HistoricalCandles}
+import ru.tinkoff.invest.openapi.models.market.{Candle, HistoricalCandles, Instrument}
 import AnalyticsTbl._
 import ru.invest.core.analytics.СandleMod._
+import ru.invest.core.ClassMod._
 trait Harami {
-  def harami(l: HistoricalCandles)(f: AnalyticsTbl => Task[_])(schedulerDB: SchedulerService): Task[_] =
+  def harami(l: HistoricalCandles)(instrument:Instrument)(f: String => Task[_])(schedulerDB: SchedulerService): Task[_] =
     for {
       k <- Task {
         l.candles.asScala.toList
@@ -18,9 +19,9 @@ trait Harami {
       q2 = k(k.size - 2)
       q1 = k.last
       _  = if ((q5, q4, q3).trendDown && (q2,q1).trendUp && harami2Up(q2,q3))
-        f(l.toAnalyticsTbl("HARAMI", "UP")).runAsyncAndForget(schedulerDB)
+        f(instrument.toStringTelegramUp).runAsyncAndForget(schedulerDB)
       _  = if ((q5, q4, q3).trendUp && (q2,q1).trendDown && harami2Down(q2,q3))
-        f(l.toAnalyticsTbl("HARAMI", "DOWN")).runAsyncAndForget(schedulerDB)
+        f(instrument.toStringTelegramDown).runAsyncAndForget(schedulerDB)
     } yield ()
 
   private val harami2Up:(Candle, Candle) => Boolean = (q1,q2) =>
