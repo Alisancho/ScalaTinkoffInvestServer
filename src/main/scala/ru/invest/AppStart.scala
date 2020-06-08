@@ -26,14 +26,15 @@ object AppStart extends TaskApp with AppStartHelper {
 
   override def run(args: List[String]): Task[ExitCode] =
     for {
-      api      <- apiTask
-      ts       <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
-      ta       = system.actorOf(TelegramActorMess(schedulerTinkoff))
-      tel      <- startTelegramService(ta)
-      bu       <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
-      _        = ta ! bu
-//      tc  <- Task { new TaskController() }
-//      _   <- Task.fromFuture { Http().bindAndHandle(Route.handlerFlow(tc.routApiV1()),SERVER_HOST,SERVER_PORT) }
+      api <- apiTask
+      ts  <- Task { new TinkoffRESTServiceImpl(api, TINKOFF_BROKER_ACCOUNT_ID) }
+      ta  = system.actorOf(TelegramActorMess(schedulerTinkoff))
+      tel <- startTelegramService(ta)
+      bu  <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
+      ggg = System.getenv()
+      _   = ta ! bu
+      tc  <- Task { new TaskController() }
+      _   <- Task.fromFuture { Http().bindAndHandle(Route.handlerFlow(tc.routApiV1()), SERVER_HOST, ggg.get("PORT").toInt) }
     } yield ExitCode.Success
 }
 
@@ -65,4 +66,5 @@ trait AppStartHelper extends LazyLogging {
                               proxyLogic(TELEGRAM_PROXY, TELEGRAM_HOST),
                               proxyLogic(TELEGRAM_PROXY, TELEGRAM_PORT))
   }
+
 }
