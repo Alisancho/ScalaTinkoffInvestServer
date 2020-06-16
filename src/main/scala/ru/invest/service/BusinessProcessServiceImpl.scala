@@ -30,7 +30,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
       logger.error(p.getMessage)
     })
 
-  def ubdateTinkoffToolsTable: Task[_] =
+  def updateTinkoffToolsTable(): Task[_] =
     for {
       mc <- tinkoffRESTServiceImpl.getMarketCurrencies
       mb <- tinkoffRESTServiceImpl.getMarketBonds
@@ -42,7 +42,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
       _  = ms.instruments.stream().forEach(m => dataBaseServiceImpl.insertTinkoffTools(m).runAsyncAndForget(schedulerDB))
     } yield ()
 
-  def updateTaskMonitoringTbl: Task[_] =
+  def updateTaskMonitoringTbl(): Task[_] =
     for {
       mc <- tinkoffRESTServiceImpl.getPortfolio
       _ = mc.positions

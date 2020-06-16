@@ -67,7 +67,7 @@ class TelegramActorMess(monitoringServiceImpl: MonitoringServiceImpl, dataBaseSe
       }
 
     case s if s.mess == UPDATE_TOOLS => {
-      businessProcessServiceImpl.ubdateTinkoffToolsTable.runAsyncAndForget(schedulerDB)
+      businessProcessServiceImpl.updateTinkoffToolsTable().runAsyncAndForget(schedulerDB)
       s.investInfoBot.sendMessage("Запущено обновление таблицы")
     }
 
