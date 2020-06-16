@@ -33,8 +33,8 @@ object AppStart extends TaskApp with AppStartHelper {
       bu  <- Task { new BusinessProcessServiceImpl(ts)(schedulerTinkoff)(materialiver) }
       ggg = System.getenv()
       _   = ta ! bu
-      tc  <- Task { new TaskController() }
-      _   <- Task.fromFuture { Http().bindAndHandle(Route.handlerFlow(tc.routApiV1()), SERVER_HOST, ggg.get("PORT").toInt) }
+//      tc  <- Task { new TaskController() }
+//      _   <- Task.fromFuture { Http().bindAndHandle(Route.handlerFlow(tc.routApiV1()), SERVER_HOST, ggg.get("PORT").toInt) }
     } yield ExitCode.Success
 }
 

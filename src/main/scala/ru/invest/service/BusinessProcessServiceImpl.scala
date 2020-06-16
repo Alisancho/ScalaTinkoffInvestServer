@@ -13,20 +13,20 @@ import ru.tinkoff.invest.openapi.models.market.Instrument
 import scala.language.postfixOps
 import scala.concurrent.duration._
 
-class BusinessProcessServiceImpl(tinkoffRESTServiceImpl:TinkoffRESTServiceImpl)(sheduler: SchedulerService)(materializer:Materializer)
+class BusinessProcessServiceImpl(tinkoffRESTServiceImpl:TinkoffRESTServiceImpl)(scheduler: SchedulerService)(materializer:Materializer)
     extends LazyLogging {
 
   def startAnalyticsJob(sharedKillSwitch: SharedKillSwitch)(f: String => Task[_]): Task[Unit] =
     for {
       c    <- tinkoffRESTServiceImpl.getMarketStocks
       list = c.instruments.asScala.toList
-      _    = analyticsStream(list, sharedKillSwitch)(tinkoffRESTServiceImpl)(f)(sheduler).run()(materializer)
+      _    = analyticsStream(list, sharedKillSwitch)(tinkoffRESTServiceImpl)(f)(scheduler).run()(materializer)
     } yield ()
 
    def analyticsStream(list: List[Instrument], sharedKillSwitch: SharedKillSwitch)
                       (tinkoff: TinkoffRESTServiceImpl)
                       (f: String => Task[_])
-                      (sheduler: SchedulerService): RunnableGraph[NotUsed] =
+                      (scheduler: SchedulerService): RunnableGraph[NotUsed] =
     Source(list)
       .throttle(1, 800.millis)
       .via(sharedKillSwitch.flow)
@@ -38,11 +38,11 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl:TinkoffRESTServiceImpl)(
             case Right(value) => {
               val list = value.get()
               logger.info(list.toString)
-              list.toAbsorption(f)(instrument)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
-              list.toHammer(f)(instrument)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
-              list.toHarami(f)(instrument)(sheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(sheduler)
+              list.toAbsorption(f)(instrument)(scheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(scheduler)
+              list.toHammer(f)(instrument)(scheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(scheduler)
+              list.toHarami(f)(instrument)(scheduler).onErrorHandle(p => logger.error(p.getMessage)).runAsyncAndForget(scheduler)
             }
-          }(sheduler)
+          }(scheduler)
       })
       .to(Sink.ignore)
 
