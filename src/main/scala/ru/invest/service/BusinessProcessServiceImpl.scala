@@ -59,7 +59,7 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
 
   private def analyticsStream(list: List[String], sharedKillSwitch: SharedKillSwitch)(
       tinkoff: TinkoffRESTServiceImpl,
-      dbs: DataBaseServiceImpl)(sheduler: SchedulerService): RunnableGraph[NotUsed] =
+      dbs: DataBaseServiceImpl)(scheduler: SchedulerService): RunnableGraph[NotUsed] =
     Source(list)
       .throttle(1, 800.millis)
       .via(sharedKillSwitch.flow)
@@ -72,19 +72,19 @@ class BusinessProcessServiceImpl(tinkoffRESTServiceImpl: TinkoffRESTServiceImpl,
               val list = value.get()
               logger.info(list.toString)
               list
-                .toAbsorption(dbs.insertAnalyticsTblTbl)(sheduler)
+                .toAbsorption(dbs.insertAnalyticsTblTbl)(scheduler)
                 .onErrorHandle(p => logger.error(p.getMessage))
-                .runAsyncAndForget(sheduler)
+                .runAsyncAndForget(scheduler)
               list
-                .toHammer(dbs.insertAnalyticsTblTbl)(sheduler)
+                .toHammer(dbs.insertAnalyticsTblTbl)(scheduler)
                 .onErrorHandle(p => logger.error(p.getMessage))
-                .runAsyncAndForget(sheduler)
+                .runAsyncAndForget(scheduler)
               list
-                .toHarami(dbs.insertAnalyticsTblTbl)(sheduler)
+                .toHarami(dbs.insertAnalyticsTblTbl)(scheduler)
                 .onErrorHandle(p => logger.error(p.getMessage))
-                .runAsyncAndForget(sheduler)
+                .runAsyncAndForget(scheduler)
             }
-          }(sheduler)
+          }(scheduler)
       })
       .to(Sink.ignore)
 

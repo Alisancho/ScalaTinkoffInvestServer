@@ -10,7 +10,7 @@ import ru.mytelegrambot.InvestInfoBot
 class TelegramServiceImpl(token: String,
                           name: String,
                           chat_id: Long,
-                          acctorRef: ActorRef,
+                          actorRef: ActorRef,
                           host: Option[String],
                           port: Option[Int])
     extends LazyLogging {
@@ -21,8 +21,8 @@ class TelegramServiceImpl(token: String,
   val investBot: InvestInfoBot = (for {
     z <- host
     x <- port
-  } yield new InvestInfoBot(token, name, getProxy(z, x), chat_id, acctorRef))
-    .getOrElse(new InvestInfoBot(token, name, chat_id, acctorRef))
+  } yield new InvestInfoBot(token, name, getProxy(z, x), chat_id, actorRef))
+    .getOrElse(new InvestInfoBot(token, name, chat_id, actorRef))
 
   telegramBotsApi.registerBot(investBot)
 
