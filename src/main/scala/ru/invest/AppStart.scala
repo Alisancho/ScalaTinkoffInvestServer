@@ -34,7 +34,7 @@ object AppStart extends TaskApp with AppStartHelper {
       bu  <- Task { new BusinessProcessServiceImpl(ts, dbs, ms, tel)(schedulerDB, schedulerTinkoff, materialiver) }
       tc  <- Task { new TaskController(bu)(schedulerTinkoff) }
       c   <- ts.getMarketStocks
-      _ = ta ! bu
+      _   = ta ! bu
     } yield ExitCode.Success
 }
 
@@ -52,20 +52,8 @@ trait AppStartHelper extends LazyLogging {
     api <- Task { new OkHttpOpenApiFactory(TOKEN, log).createOpenApiClient(schedulerTinkoff) }
   } yield api
 
-  def proxyLogic[T](q: Boolean, w: T): Option[T] =
-    if (q) {
-      Option.apply(w)
-    } else {
-      Option.empty
-    }
-
   val startTelegramService: ActorRef => Task[TelegramServiceImpl] = actor =>
     Task {
-      new TelegramServiceImpl(TELEGRAM_TOKEN,
-                              TELEGRAM_NAMEBOT,
-                              TELEGRAM_CHAT_ID,
-                              actor,
-                              proxyLogic(TELEGRAM_PROXY, TELEGRAM_HOST),
-                              proxyLogic(TELEGRAM_PROXY, TELEGRAM_PORT))
+      new TelegramServiceImpl(TELEGRAM_TOKEN, TELEGRAM_NAMEBOT, TELEGRAM_CHAT_ID, actor)
   }
 }

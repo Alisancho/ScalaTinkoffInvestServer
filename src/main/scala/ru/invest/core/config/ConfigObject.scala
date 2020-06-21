@@ -16,9 +16,6 @@ object ConfigObject {
 
   val TELEGRAM_TOKEN: String   = conf.getString("telegtam.token")
   val TELEGRAM_NAMEBOT: String = conf.getString("telegtam.namebot")
-  val TELEGRAM_HOST: String    = conf.getString("telegtam.host")
-  val TELEGRAM_PROXY: Boolean  = conf.getBoolean("telegtam.proxy")
-  val TELEGRAM_PORT: Int       = conf.getInt("telegtam.port")
   val TELEGRAM_CHAT_ID: Int    = conf.getInt("telegtam.chat.id")
 
   val START: String           = "/start"
